@@ -1,0 +1,18 @@
+h1 {
+    color: rgb(6, 114, 216);
+    opacity: 0.7;
+    font-family: 'Gill Sans', sans-serif;
+    font-size: 300%;
+}
+hr.rounded {
+    border-top: 5px solid #29282e;
+    opacity: 0.5;
+    border-radius: 5px;
+    width: 70%;
+}
+h2 {
+    color: rgb(6, 114, 216);
+    opacity: 0.7;
+    font-family: 'Gill Sans', sans-serif;
+    font-size: 200%;
+}
