@@ -29,8 +29,10 @@
     
         <script>
             async function fetchAsync () {
-                let response = await fetch("http://localhost:8080/movies");
-                let data = await JSON.parse(response);
+                const response = await fetch("http://localhost:8080/movies");
+                if (!response.ok)
+                    throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+                const data = await response.json();
                 return data;
             }          
 
@@ -71,8 +73,9 @@
                     ["Domenica, Riga 3, Colonna 1", "Domenica, Riga 3, Colonna 2", "Domenica, Riga 3, Colonna 3", "Domenica, Riga 3, Colonna 4", "Domenica, Riga 3, Colonna 5"]
                 ]
             ];
-    
-            function showTable(dayIndex) {
+           
+            
+            async function showTable(dayIndex) {
                 var daysContainer = document.getElementById("daysContainer");
                 var tableContainer = document.getElementById("tableContainer");
                 var dayTitle = document.getElementById("dayTitle");
@@ -92,20 +95,36 @@
     
                 // Genera la tabella con il contenuto corrispondente al giorno
                 var tableContent = dayTables[dayIndex]; 
-                
-                //PROBLEMA GRANDE DA RISOLVERE QUI
+                var data = await fetchAsync();
+                //PROBLEMA GRANDE DA RISOLVERE QUI **Risolto** :) 
                 var tableHTML = "";
-                for (var i = 0; i < tableContent.length; i++) {
+                tableHTML += "<tr>";
+                for(let x in data[0][0]){
+                    if(x == "seatsGrid") continue;
+                    tableHTML += "<th>" + x + "</th>";
+                }
+                tableHTML += "</tr>";
+                for(let i = 0; i < data[dayIndex].length; i++){
+                    tableHTML += "<tr>";
+                    for(let x in data[dayIndex][i]){
+                        if(x == "seatsGrid") continue;
+                        tableHTML += "<td>" + data[dayIndex][i][x] + "</td>";
+                    }
+                    tableHTML += "</tr>";
+                }
+
+                /*  for (var i = 0; i < tableContent.length; i++) {
                     tableHTML += "<tr>";
                     for (var j = 0; j < tableContent[i].length; j++) {
                         tableHTML += "<td>" + tableContent[i][j] + "</td>";
                     }
                     tableHTML += "</tr>";
-                }
+                } */
                 dayTable.innerHTML = tableHTML;
     
                 tableContainer.style.display = "block";
             }
+                    
         </script>
 
     </body>
