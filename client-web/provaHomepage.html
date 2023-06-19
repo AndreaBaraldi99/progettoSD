@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Homepage Cinema</title>
+        <link rel="stylesheet" href="styles.css">
+        <h1 style="text-align:center">Cinema X</h1>
+        <hr class="rounded">
+        <h2 style="text-align:center">Programmazione</h2>
+        <h3>Seleziona un giorno della settimana:</h3>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", async function () {
+            // Imposta il giorno predefinito
+            const defaultDayIndex = 0; // Lunedì
+            await showTable(defaultDayIndex);
+            });
+        </script>
+    </head>
+    
+    <body>
+        <div id="daysContainer">
+            <button onclick="showTable(0)">Lunedì</button>
+            <button onclick="showTable(1)">Martedì</button>
+            <button onclick="showTable(2)">Mercoledì</button>
+            <button onclick="showTable(3)">Giovedì</button>
+            <button onclick="showTable(4)">Venerdì</button>
+            <button onclick="showTable(5)">Sabato</button>
+            <button onclick="showTable(6)">Domenica</button>
+        </div>
+        <br><br>
+        <div id="tableContainer" style="display: none;">
+            <h4 id="dayTitle"></h4>
+            <table id="dayTable">
+            <!-- Contenuto della tabella verrà generato dinamicamente -->
+            </table>
+        </div>
+    
+        <script>
+            async function fetchMovies() {
+                try {
+                    const response = await fetch("http://localhost:8080/movies");
+                    if (!response.ok)
+                        throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error(error);
+                }
+            }                
+           
+            async function showTable(dayIndex) {
+                const daysContainer = document.getElementById("daysContainer");
+                const tableContainer = document.getElementById("tableContainer");
+                const dayTitle = document.getElementById("dayTitle");
+                const dayTable = document.getElementById("dayTable");
+                const buttons = daysContainer.getElementsByTagName("button");
+
+                // Rimuovi la classe 'active' da tutti i pulsanti
+                for (let i = 0; i < buttons.length; i++) {
+                    buttons[i].classList.remove("active");
+                }
+
+                // Aggiungi la classe 'active' al pulsante selezionato
+                buttons[dayIndex].classList.add("active");
+
+                // Imposta il titolo del giorno corrispondente
+                dayTitle.innerHTML = buttons[dayIndex].innerHTML;
+
+                // Ottieni i dati delle proiezioni dalla chiamata API
+                const moviesData = await fetchMovies();
+                const movies = moviesData[dayIndex];
+
+                // Genera la tabella con il contenuto corrispondente al giorno
+                let tableHTML = "";
+                tableHTML += "<tr>";
+                tableHTML += "<th>Title</th>";
+                tableHTML += "<th>Time</th>";
+                tableHTML += "</tr>";
+
+                for (const movie of movies) {
+                    tableHTML += "<tr>";
+                    tableHTML += "<td>" + movie.title + "</td>";
+                    tableHTML += "<td>" + movie.time + "</td>";
+                    tableHTML += "</tr>";
+                }
+
+                dayTable.innerHTML = tableHTML;
+
+                tableContainer.style.display = "block";
+                console.log(moviesData);
+                }
+
+
+                    
+        </script>
+
+    </body>
+</html>
