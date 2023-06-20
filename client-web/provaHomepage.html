@@ -77,12 +77,6 @@
                 tableHTML += "<th>Time</th>";
                 tableHTML += "</tr>";
 
-                /*for (const movie of movies) {
-                    tableHTML += "<tr>";
-                    tableHTML += "<td>" + movie.title + "</td>";
-                    tableHTML += "<td>" + movie.time + "</td>";
-                    tableHTML += "</tr>";*/
-
                 for (const [index, movie] of movies.entries()) {
                     tableHTML += "<tr onclick='changePage(" + index + ")'>";
                     tableHTML += "<td>" + movie.title + "</td>";
@@ -97,8 +91,7 @@
                 }
                 
                 function changePage(movieIndex) {
-                // Esegui l'azione desiderata quando viene selezionato un film, ad esempio:
-                // Reindirizza l'utente a una pagina con ulteriori dettagli del film
+                sessionStorage.setItem("selectedMovieIndex", movieIndex);
                 window.location.href = "prenotazioni.html?index=" + movieIndex;
             }
           
