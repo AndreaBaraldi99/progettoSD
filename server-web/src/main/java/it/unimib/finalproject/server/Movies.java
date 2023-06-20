@@ -2,6 +2,7 @@ package it.unimib.finalproject.server;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -56,34 +57,100 @@ public class Movies {
 			Movie mv = new Movie();
 			mv.setTitle("Colpa delle stelle");
 			mv.setDate(day + "/08/2023");
-			mv.setTime("18:00");
-			mv.setRoom(5);
-			mv.setLength(120);
-			mv.setSeats(100);
-			mv.setAvailable(100);
-			mv.setSeatsGrid(new int[10][10]);
+			Room[] rooms = new Room[2];
+			rooms[0] = new Room();
+			rooms[0].setTime("18:00");
+			rooms[0].setRoom(5);
+			rooms[0].setLength(120);
+			rooms[0].setSeats(100);
+			rooms[0].setAvailable(100);
+			int[][] seatsGrid = new int[10][10];
+			for(int j = 0; j < 10; j++) {
+				for(int k = 0; k < 10; k++) {
+					seatsGrid[j][k] = (int)Math.round(Math.random());
+				}
+			}
+			rooms[0].setSeatsGrid(seatsGrid);
+			rooms[1] = new Room();
+			rooms[1].setTime("20:00");
+			rooms[1].setRoom(6);
+			rooms[1].setLength(90);
+			rooms[1].setSeats(100);
+			rooms[1].setAvailable(100);
+			seatsGrid = new int[10][10];
+			for(int j = 0; j < 10; j++) {
+				for(int k = 0; k < 10; k++) {
+					seatsGrid[j][k] = (int)Math.round(Math.random());
+				}
+			}
+			rooms[1].setSeatsGrid(seatsGrid);
+			mv.setRooms(rooms);
 			days.get(i).add(mv);
 
 			mv = new Movie();
 			mv.setTitle("Salvate il soldato Ryan");
 			mv.setDate(day + "/08/2023");
-			mv.setTime("20:00");
-			mv.setRoom(5);
-			mv.setLength(90);
-			mv.setSeats(100);
-			mv.setAvailable(100);
-			mv.setSeatsGrid(new int[10][10]);
+			rooms = new Room[2];
+			rooms[0] = new Room();
+			rooms[1] = new Room();
+			rooms[0].setTime("18:00");
+			rooms[0].setRoom(5);
+			rooms[0].setLength(120);
+			rooms[0].setSeats(100);
+			rooms[0].setAvailable(100);
+			seatsGrid = new int[10][10];
+			for(int j = 0; j < 10; j++) {
+				for(int k = 0; k < 10; k++) {
+					seatsGrid[j][k] = (int)Math.round(Math.random());
+				}
+			}
+			rooms[0].setSeatsGrid(seatsGrid);
+			rooms[1].setTime("20:00");
+			rooms[1].setRoom(6);
+			rooms[1].setLength(90);
+			rooms[1].setSeats(100);
+			rooms[1].setAvailable(100);
+			seatsGrid = new int[10][10];
+			for(int j = 0; j < 10; j++) {
+				for(int k = 0; k < 10; k++) {
+					seatsGrid[j][k] = (int)Math.round(Math.random());
+				}
+			}
+			rooms[1].setSeatsGrid(seatsGrid);
+			mv.setRooms(rooms);
 			days.get(i).add(mv);
 
 			mv = new Movie();
 			mv.setTitle("Interstellar");
 			mv.setDate(day + "/08/2023");
-			mv.setTime("22:00");
-			mv.setRoom(6);
-			mv.setLength(150);
-			mv.setSeats(150);
-			mv.setAvailable(150);
-			mv.setSeatsGrid(new int[10][15]);
+			rooms = new Room[2];
+			rooms[0] = new Room();
+			rooms[1] = new Room();
+			rooms[0].setTime("18:00");
+			rooms[0].setRoom(5);
+			rooms[0].setLength(120);
+			rooms[0].setSeats(100);
+			rooms[0].setAvailable(100);
+			seatsGrid = new int[10][10];
+			for(int j = 0; j < 10; j++) {
+				for(int k = 0; k < 10; k++) {
+					seatsGrid[j][k] = (int)Math.round(Math.random());
+				}
+			}
+			rooms[0].setSeatsGrid(seatsGrid);
+			rooms[1].setTime("20:00");
+			rooms[1].setRoom(6);
+			rooms[1].setLength(90);
+			rooms[1].setSeats(100);
+			rooms[1].setAvailable(100);
+			seatsGrid = new int[10][10];
+			for(int j = 0; j < 10; j++) {
+				for(int k = 0; k < 10; k++) {
+					seatsGrid[j][k] = (int)Math.round(Math.random());
+				}
+			}
+			rooms[1].setSeatsGrid(seatsGrid);
+			mv.setRooms(rooms);
 			days.get(i).add(mv);
 			day++;	
 		}
@@ -94,29 +161,16 @@ public class Movies {
 	public Response getMovies() {
 		return Response.ok(days).build();
 	}
-
-	@Path("/{id}")
+	
 	@GET
+	@Path("/{dayIndex}/{movieIndex}/{time}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDaySchedule(@PathParam("id") int id) {
-		if(id < 0 || id > 6)
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		return Response.ok(days.get(id)).build();
-	}
-
-	@Path("/{id}/{room}")
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRoomSchedule(@PathParam("id") int id, @PathParam("room") int room) {
-		List<Movie> movies = new ArrayList<Movie>();
-		if(id < 0 || id > 6)
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		for(Movie mv : days.get(id)) {
-			if(mv.getRoom() == room)
-				movies.add(mv);
+	public Response getMovie(@PathParam ("dayIndex") int dayIndex, @PathParam ("movieIndex") int movieIndex, @PathParam ("time") String time) {
+		for(Room room : days.get(dayIndex).get(movieIndex).getRooms()) {
+			if(room.getTime().equals(time)) {
+				return Response.ok(room).build();
+			}
 		}
-		if(movies.isEmpty())
-			return Response.status(Response.Status.NOT_FOUND).build();
-		return Response.ok(movies).build();
+		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 }

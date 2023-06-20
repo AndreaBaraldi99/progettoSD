@@ -4,13 +4,7 @@ public class Movie{
 	
 	private String title;
 	private String date;
-	private String time;
-	private int room;
-	private int length;
-	private int seats;
-	private int available;
-	private int[][] seatsGrid;
-
+	private Room[] rooms;
 	
 	public String getTitle() {
 		return title;
@@ -24,41 +18,11 @@ public class Movie{
 	public void setDate(String date) {
 		this.date = date;
 	}
-	public int getRoom() {
-		return room;
+	public Room[] getRooms() {
+		return rooms;
 	}
-	public void setRoom(int room) {
-		this.room = room;
-	}
-	public String getTime() {
-		return time;
-	}
-	public void setTime(String time) {
-		this.time = time;
-	}
-	public int getLength() {
-		return length;
-	}
-	public void setLength(int length) {
-		this.length = length;
-	}
-	public void setSeats(int seats) {
-		this.seats = seats;
-	}
-	public int getSeats() {
-		return seats;
-	}
-	public void setAvailable(int available) {
-		this.available = available;
-	}
-	public int getAvailable() {
-		return available;
-	}
-	public void setSeatsGrid(int[][] seatsGrid) {
-		this.seatsGrid = seatsGrid;
-	}
-	public int[][] getSeatsGrid() {
-		return seatsGrid;
+	public void setRooms(Room[] rooms) {
+		this.rooms = rooms;
 	}
 	
 }

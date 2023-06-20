@@ -15,10 +15,11 @@
             // Recupera l'indice del film dal parametro dell'URL
             const urlParams = new URLSearchParams(window.location.search);
             const movieIndex = urlParams.get('index');
-    
-            async function fetchMovieDetails(movieIndex) {
+            const movie = urlParams.get('movie');
+            const time = urlParams.get('time');
+            async function fetchMovieDetails() {
                 try {
-                    const response = await fetch("http://localhost:8080/movies/" + movieIndex);
+                    const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time);
                     if (!response.ok)
                         throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
                     const data = await response.json();
@@ -65,7 +66,7 @@
                     return;
                 }
 
-                const movieData = await fetchMovieDetails(movieIndex);
+                const movieData = await fetchMovieDetails();
                 generateSeatsGrid(movieData);
             }
     

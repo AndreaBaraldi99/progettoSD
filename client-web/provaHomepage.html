@@ -76,13 +76,24 @@
                 tableHTML += "<th>Title</th>";
                 tableHTML += "<th>Time</th>";
                 tableHTML += "</tr>";
-
+/* 
                 for (const [index, movie] of movies.entries()) {
-                    tableHTML += "<tr onclick='changePage(" + index + ")'>";
+                    tableHTML += "<tr>";
                     tableHTML += "<td>" + movie.title + "</td>";
-                    tableHTML += "<td>" + movie.time + "</td>";
+                    for(let x in moviesData[dayIndex][index].rooms)
+                        tableHTML += "<td onclick='changePage(" + index + ")'>" + movie.time + "</td>";
+                    tableHTML += "</tr>";
+                } */
+
+                for(let i = 0; i < moviesData[dayIndex].length; i++){
+                    tableHTML += "<tr>";
+                    tableHTML += "<td>" + moviesData[dayIndex][i].title + "</td>";
+                    for(let j = 0; j < moviesData[dayIndex][i].rooms.length; j++)
+                        tableHTML += "<td onclick= 'changePage(" + dayIndex + ", \"" + i + "\", \"" + moviesData[dayIndex][i].rooms[j].time + "\")'>" + moviesData[dayIndex][i].rooms[j].time + " " + "</td>";
+                    
                     tableHTML += "</tr>";
                 }
+
 
                 dayTable.innerHTML = tableHTML;
 
@@ -90,9 +101,9 @@
                 console.log(moviesData);
                 }
                 
-                function changePage(movieIndex) {
+                function changePage(movieIndex, movie, time) {
                 sessionStorage.setItem("selectedMovieIndex", movieIndex);
-                window.location.href = "prenotazioni.html?index=" + movieIndex;
+                window.location.href = "prenotazioni.html?index=" + movieIndex + "&movie=" + movie + "&time=" + time;
             }
           
         </script>
