@@ -1,99 +1,139 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Prenotazione posti al cinema</title>
+  <title>Prenotazione Posti Cinema</title>
   <style>
-    .seat-map {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-      gap: 5px;
-      max-width: 500px;
-      margin: 0 auto;
+    body {
+      font-family: Arial, sans-serif;
+      background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+      margin: 0;
+      padding: 20px;
     }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #movie-info {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #seats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
     .seat {
-      width: 50px;
-      height: 50px;
-      background-color: lightgray;
+      width: 30px;
+      height: 30px;
+      margin: 5px;
+      background-color: #ccc;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
-    .selected {
-      background-color: yellow;
-    }
-    .disabled {
-      background-color: gray;
+
+    .seat.disabled {
+      background-color: #888;
       cursor: not-allowed;
+    }
+
+    .seat.selected {
+      background-color: #ff0000;
+    }
+
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
     }
   </style>
 </head>
 <body>
-  <h1>Sala cinematografica</h1>
-  <div id="seat-map"></div>
-  <button id="book-btn">Prenota</button>
+  <h1>Prenotazione Posti Cinema</h1>
+  <div id="movie-info">
+    <h2>Titolo del Film</h2>
+    <p>Durata: 2 ore</p>
+    <p>Ora di inizio: 19:30</p>
+    <p>Regista: Nome del Regista</p>
+  </div>
+  <div id="seats"></div>
+  <button onclick="bookSeats()">Prenota</button>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      // Matrice di esempio per la disposizione dei posti
-      var seatMap = [
-        [1, 1, 1, 0, 0, 0, 1],
-        [1, 1, 1, 1, 0, 0, 0],
-        [0, 0, 1, 0, 0, 1, 1],
-        [0, 0, 0, 1, 1, 1, 1],
-        [1, 0, 0, 0, 1, 1, 1]
-      ];
+     // Dati fittizi dei posti
+    const seatData = [
+      [1, 0, 1, 1, 0],
+      [0, 1, 0, 1, 1],
+      [1, 1, 0, 0, 1],
+      [0, 0, 1, 1, 0]
+    ];
 
-      // Crea la disposizione dei posti sulla pagina HTML
-      var seatMapElement = document.getElementById('seat-map');
-      seatMap.forEach((row, rowIndex) => {
-        row.forEach((seat, columnIndex) => {
-          var seatElement = document.createElement('div');
-          seatElement.classList.add('seat');
-          seatElement.dataset.row = rowIndex;
-          seatElement.dataset.column = columnIndex;
-          if (seat === 0) {
-            seatElement.classList.add('disabled');
+    const seatsContainer = document.getElementById("seats");
+
+    // Funzione per creare la disposizione dei posti
+    function createSeats() {
+      for (let i = 0; i < seatData.length; i++) {
+        const row = document.createElement("div");
+        for (let j = 0; j < seatData[i].length; j++) {
+          const seat = document.createElement("div");
+          seat.className = "seat";
+          if (seatData[i][j] === 0) {
+            seat.classList.add("disabled");
           }
-          seatMapElement.appendChild(seatElement);
-        });
-      });
+          seat.onclick = function() {
+            if (!seat.classList.contains("disabled")) {
+              toggleSeatSelection(seat, i, j);
+            }
+          };
+          row.appendChild(seat);
+        }
+        seatsContainer.appendChild(row);
+      }
+    }
 
-      // Gestisci il clic sui posti
-      var seats = document.querySelectorAll('.seat:not(.disabled)');
-      var selectedSeats = [];
+    // Funzione per selezionare/deselezionare un posto
+    function toggleSeatSelection(seat, row, col) {
+      if (seat.classList.contains("selected")) {
+        seat.classList.remove("selected");
+        seatData[row][col] = 1; // Imposta il posto come disponibile
+      } else {
+        seat.classList.add("selected");
+        seatData[row][col] = 0; // Imposta il posto come selezionato
+      }
+    }
 
-      seats.forEach(seat => {
-        seat.addEventListener('click', function() {
-          this.classList.toggle('selected');
-
-          var row = parseInt(this.dataset.row);
-          var column = parseInt(this.dataset.column);
-
-          var seatIndex = selectedSeats.findIndex(s => s.row === row && s.column === column);
-
-          if (seatIndex !== -1) {
-            selectedSeats.splice(seatIndex, 1);
-          } else {
-            selectedSeats.push({ row: row, column: column });
+    // Funzione per prenotare i posti selezionati
+    function bookSeats() {
+      const selectedSeats = [];
+      for (let i = 0; i < seatData.length; i++) {
+        for (let j = 0; j < seatData[i].length; j++) {
+          if (seatData[i][j] === 0) {
+            selectedSeats.push({ row: i, col: j });
           }
-        });
-      });
+        }
+      }
+      // Simulazione della richiesta POST al server
+      const postData = JSON.stringify(selectedSeats);
+      console.log("Dati inviati al server:", postData);
+      // Esegui qui la richiesta POST reale al server
+    }
 
-      // Gestisci il clic sul pulsante "Prenota"
-      var bookBtn = document.getElementById('book-btn');
-      bookBtn.addEventListener('click', function() {
-        // Esegui una richiesta POST al server per inviare i posti prenotati
-        fetch('prenota_posti.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ seats: selectedSeats })
-        })
-          .then(response => response.json())
-          .then(data => {
-            console.log(data); // Gestisci la risposta del server
-          });
-      });
-    });
+    // Avvia la creazione dei posti
+    createSeats();
   </script>
 </body>
 </html>
