@@ -4,7 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -172,5 +178,24 @@ public class Movies {
 			}
 		}
 		return Response.status(Response.Status.NOT_FOUND).build();
+	}
+
+	@POST
+	@Path("/{dayIndex}/{movieIndex}/{time}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response postMovie(@PathParam ("dayIndex") int dayIndex, @PathParam ("movieIndex") int movieIndex, @PathParam ("time") String time, String body) {
+		try {
+			var mapper = new ObjectMapper();
+			var seats = mapper.readValue(body, Object[].class);
+			System.out.println(seats);
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return Response.ok().build();
 	}
 }

@@ -1,76 +1,162 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Prenotazioni</title>
-        <link rel="stylesheet" href="styles.css">
-    </head>
-    <body>
-        <h1 style="text-align:center">Prenotazioni</h1>
-        <hr class="rounded">
-        <h2 style="text-align:center">Griglia dei posti</h2>
-        <div id="seatsGrid"></div>
-        <br><br>
-        
-        <script>
-            // Recupera l'indice del film dal parametro dell'URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const movieIndex = urlParams.get('index');
-            const movie = urlParams.get('movie');
-            const time = urlParams.get('time');
-            async function fetchMovieDetails() {
-                try {
-                    const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time);
-                    if (!response.ok)
-                        throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
-                    const data = await response.json();
-                    return data;
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-    
-            function generateSeatsGrid(seatsData) {
-                const seatsGridContainer = document.getElementById("seatsGrid");
-                seatsGridContainer.innerHTML = ""; // Cancella eventuali contenuti precedenti
-    
-                const seatsGrid = seatsData.seatsGrid;
-    
-                const table = document.createElement("table");
-    
-                for (let i = 0; i < seatsGrid.length; i++) {
-                    const row = document.createElement("tr");
-    
-                    for (let j = 0; j < seatsGrid[i].length; j++) {
-                        const seat = document.createElement("td");
-                        seat.classList.add("seat");
-    
-                        if (seatsGrid[i][j] === 0) {
-                            seat.classList.add("available");
-                        } else {
-                            seat.classList.add("booked");
-                        }
-    
-                        row.appendChild(seat);
-                    }
-    
-                    table.appendChild(row);
-                }
-    
-                seatsGridContainer.appendChild(table);
-            }
-    
-            async function showSeatsGrid() {
-                const movieIndex = urlParams.get('index');
-                if (!movieIndex) {
-                    // Nessun indice del film presente, gestisci l'errore o reindirizza l'utente
-                    return;
-                }
+<head>
+  <title>Prenotazione Posti Cinema</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+      margin: 0;
+      padding: 20px;
+    }
 
-                const movieData = await fetchMovieDetails();
-                generateSeatsGrid(movieData);
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #movie-info {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #seats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .seat {
+      width: 30px;
+      height: 30px;
+      margin: 5px;
+      background-color: #ccc;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .seat.disabled {
+      background-color: #888;
+      cursor: not-allowed;
+    }
+
+    .seat.selected {
+      background-color: #ff0000;
+    }
+
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Prenotazione Posti Cinema</h1>
+  <div id="movie-info">
+    <h2>Titolo del Film</h2>
+    <p>Durata: 2 ore</p>
+    <p>Ora di inizio: 19:30</p>
+    <p>Regista: Nome del Regista</p>
+  </div>
+  <div id="seats"></div>
+  <button onclick="bookSeats()">Prenota</button>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieIndex = urlParams.get('index');
+    const movie = urlParams.get('movie');
+    const time = urlParams.get('time');
+    async function fetchMovieDetails() {
+      try {
+        const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time);
+        if (!response.ok)
+          throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+          const data = await response.json();
+          return data;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+     // Dati fittizi dei posti
+    /* const seatData = [
+      [1, 0, 1, 1, 0],
+      [0, 1, 0, 1, 1],
+      [1, 1, 0, 0, 1],
+      [0, 0, 1, 1, 0]
+    ]; */
+
+    const seatsContainer = document.getElementById("seats");
+
+    // Funzione per creare la disposizione dei posti
+    async function createSeats() {
+      const data = await fetchMovieDetails();
+      const seatData = data.seatsGrid;
+      for (let i = 0; i < seatData.length; i++) {
+        const row = document.createElement("div");
+        for (let j = 0; j < seatData[i].length; j++) {
+          const seat = document.createElement("div");
+          seat.className = "seat";
+          if (seatData[i][j] === 0) {
+            seat.classList.add("disabled");
+          }
+          seat.onclick = function() {
+            if (!seat.classList.contains("disabled")) {
+              toggleSeatSelection(seat, i, j);
             }
-    
-            showSeatsGrid();
-        </script>
-    </body>
+          };
+          row.appendChild(seat);
+        }
+        seatsContainer.appendChild(row);
+      }
+    }
+
+    // Funzione per selezionare/deselezionare un posto
+    function toggleSeatSelection(seat, row, col) {
+      if (seat.classList.contains("selected")) {
+        seat.classList.remove("selected");
+        seatData[row][col] = 1; // Imposta il posto come disponibile
+      } else {
+        seat.classList.add("selected");
+        seatData[row][col] = 0; // Imposta il posto come selezionato
+      }
+    }
+
+    // Funzione per prenotare i posti selezionati
+    async function bookSeats() {
+      const selectedSeats = [];
+      for (let i = 0; i < seatData.length; i++) {
+        for (let j = 0; j < seatData[i].length; j++) {
+          if (seatData[i][j] === 0) {
+            selectedSeats.push({ row: i, col: j });
+          }
+        }
+      }
+      
+      const postData = JSON.stringify(selectedSeats);
+      const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: postData
+      });
+      // Esegui qui la richiesta POST reale al server
+    }
+
+    // Avvia la creazione dei posti
+    createSeats();
+  </script>
+</body>
 </html>
