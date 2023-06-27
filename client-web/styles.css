@@ -87,21 +87,4 @@ th, td {
 }
 
 /*Griglia dei posti - pagina Prenotazioni*/
-.row {
-  display: flex;
-}
-  .seat {
-width: 30px;
-height: 30px;
-border: 1px solid #000;
-margin: 2px;
-}
 
-.available {
-background-color: #e8e8e8;
-}
-
-.booked {
-background-color: rgb(101, 100, 100);
-color: #fff;
-}

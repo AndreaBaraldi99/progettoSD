@@ -65,25 +65,34 @@
 <body>
   <h1>Prenotazione Posti Cinema</h1>
   <div id="movie-info">
-    <h2>Titolo del Film</h2>
-    <p>Durata: 2 ore</p>
-    <p>Ora di inizio: 19:30</p>
-    <p>Regista: Nome del Regista</p>
+    <h2 id="filmTitolo"> titolo</h2>
+    <p id="filmDurata"></p>
+    <p id="filmOraInizio"></p>
+    <p id="filmRegista">Regista: Nome del Regista</p>
   </div>
   <div id="seats"></div>
   <button onclick="bookSeats()">Prenota</button>
 
   <script>
+    let seatData = [[]];
+
     const urlParams = new URLSearchParams(window.location.search);
     const movieIndex = urlParams.get('index');
     const movie = urlParams.get('movie');
     const time = urlParams.get('time');
+    
     async function fetchMovieDetails() {
       try {
         const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time);
         if (!response.ok)
           throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
           const data = await response.json();
+          
+          document.getElementById("filmDurata").innerText = "Durata: " + data.length + " minuti";
+          document.getElementById("filmOraInizio").innerText = "Ora di inizio: " + data.time;
+          //document.getElementById("filmRegista").innerText = "Regista: " + data.regista;
+          return data;
+
           return data;
         } catch (error) {
             console.error(error);
@@ -96,13 +105,24 @@
       [1, 1, 0, 0, 1],
       [0, 0, 1, 1, 0]
     ]; */
-
+    
+    // Funzione per generare un codice univoco utilizzando una combinazione di caratteri esadecimali e caratteri specifici
+    function generateUniqueCode() {
+        const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0,
+        v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+        });
+        return uuid;
+    }
+    const reservationCode = generateUniqueCode(); // Genera un codice univoco per la prenotazione
+    
     const seatsContainer = document.getElementById("seats");
 
     // Funzione per creare la disposizione dei posti
     async function createSeats() {
       const data = await fetchMovieDetails();
-      const seatData = data.seatsGrid;
+      seatData = data.seatsGrid;
       for (let i = 0; i < seatData.length; i++) {
         const row = document.createElement("div");
         for (let j = 0; j < seatData[i].length; j++) {
@@ -143,16 +163,23 @@
           }
         }
       }
-      
-      const postData = JSON.stringify(selectedSeats);
-      const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: postData
-      });
-      // Esegui qui la richiesta POST reale al server
+    
+    //richiesta POST
+    const postData = {seats: selectedSeats,code: reservationCode};   
+    try {
+        const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time, {
+            method: "POST",
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify(postData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+        }
+        //console.log("POST effettuata!"); 
+    } catch (error) {
+        console.error("Errore durante la prenotazione dei posti:", error);
+    }
     }
 
     // Avvia la creazione dei posti
