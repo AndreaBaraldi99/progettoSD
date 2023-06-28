@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Conferma Prenotazione</title>
+    <link rel="stylesheet" href="styles.css">
+    <h2 style="text-align:center">La prenotazione è stata effettuata con successo!</h2>
+    <h3 style="text-align:center">Ecco un riepilogo dei dati relativi alla prenotazione:</h3>
+</head>
+<body>
+    <div id="riepilogo">
+        <p id="reservation-code"></p>
+        <p id="titolo"></p>
+        <p id="orario"></p>
+        <p id="postiSelezionati"></p>
+    </div>
+    <script>
+        //nota: le scritte del riepilogo non vengono mostrate, le sistemo poi
+        const urlParams = new URLSearchParams(window.location.search);
+        const reservationCode = urlParams.get('code');
+        const movie = urlParams.get('movie');
+        const time = urlParams.get('time');
+
+        function getMovieTitle(movie) {
+            switch (movie) {
+                case '0':
+                return 'Colpa delle stelle';
+                case '1':
+                return 'Salvate il soldato Ryan';
+                case '2':
+                return 'Interstellar';
+                default:
+                return 'Titolo Film Sconosciuto';
+            }
+            }
+        
+        const movieTitle = getMovieTitle(movie);
+        document.getElementById("filmTitolo").innerText = "Titolo del film: " + movieTitle;
+        document.getElementById("orario").innerText ="Orario: " + time;
+        document.getElementById("reservation-code").innerText = "Codice prenotazione: " + reservationCode;
+            
+        
+        // Recupera i dati della prenotazione
+        async function fetchBookingData() {
+        try {
+            // Effettua una richiesta al server per ottenere i dati della prenotazione
+            const response = await fetch("http://localhost:8080/movies/" + reservationCode);
+
+            if (!response.ok) {
+            throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+            }
+
+            const bookingData = await response.json();
+            const selectedSeatsElement = document.getElementById("postiSelezionati");
+            selectedSeatsElement.textContent = "Posti prenotati: " + bookingData.seats.join(", "); //
+        } catch (error) {
+            console.error("Errore durante il recupero dei dati della prenotazione:", error);
+        }
+        }
+        // Avvia il recupero dei dati della prenotazione
+        fetchBookingData();
+
+
+    </script>
+</body>
+</html>
