@@ -23,8 +23,10 @@ public class Movie{
 	}
 	public void setRooms(Room[] rooms) {
 		this.rooms = rooms;
-		for(Room r : rooms)
+		for(Room r : rooms){
 			r.setTitle(title);
+			r.setDate(date);
+		}
 	}
 	
 }
