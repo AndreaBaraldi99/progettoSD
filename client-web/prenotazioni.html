@@ -81,6 +81,21 @@
     const movie = urlParams.get('movie');
     const time = urlParams.get('time');
     
+    function getMovieTitle(movie) {
+      switch (movie) {
+        case '0':
+          return 'Colpa delle stelle';
+        case '1':
+          return 'Salvate il soldato Ryan';
+        case '2':
+          return 'Interstellar';
+        default:
+          return 'Titolo Film Sconosciuto';
+      }
+    }
+    const movieTitle = getMovieTitle(movie);
+    document.getElementById("filmTitolo").innerText = movieTitle;
+
     async function fetchMovieDetails() {
       try {
         const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time);
@@ -164,7 +179,7 @@
         }
       }
     
-    //richiesta POST
+    //richiesta POST 
     const postData = {seats: selectedSeats,code: reservationCode};   
     try {
         const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time, {
@@ -176,7 +191,7 @@
         if (!response.ok) {
             throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
         }
-        //console.log("POST effettuata!"); 
+        window.location.href = "modificaPrenotazione.html?code=" + reservationCode + "&movie=" + movie + "&time=" + time;
     } catch (error) {
         console.error("Errore durante la prenotazione dei posti:", error);
     }

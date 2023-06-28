@@ -86,5 +86,9 @@ th, td {
   border: 1px solid #ddd;
 }
 
-/*Griglia dei posti - pagina Prenotazioni*/
-
+/*Pagina di modificaPrenotazione*/
+#riepilogo{
+  text-align: center;
+  font-family: 'Gill Sans', sans-serif;
+  color:rgb(101, 100, 100);
+}
