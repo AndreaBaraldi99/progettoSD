@@ -11,6 +11,7 @@
         <p id="reservation-code"></p>
         <p id="titolo"></p>
         <p id="orario"></p>
+        <p>Posti Selezionati:</p>
         <p id="postiSelezionati"></p>
     </div>
     <script>
@@ -20,7 +21,44 @@
         const movie = urlParams.get('movie');
         const time = urlParams.get('time');
 
-        function getMovieTitle(movie) {
+        async function fetchBookingData() {
+            try {
+                // Effettua una richiesta al server per ottenere i dati della prenotazione
+                const response = await fetch("http://localhost:8080/movies/reservations/" + reservationCode);
+
+                if (!response.ok) {
+                    throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+                }
+
+                const bookingData = await response.json();
+                return bookingData;
+            } catch (error) {
+                console.error("Errore durante il recupero dei dati della prenotazione:", error);
+            }
+        }
+
+        async function showDetails(){
+            const bookingData = await fetchBookingData();
+            let seats = "";
+            for (let i = 0; i < bookingData.seats.length; i++) {
+                seats += "Posto: " + (bookingData.seats[i].column + 1) + ", Fila: " + (bookingData.seats[i].row + 1);
+                if (i !== bookingData.seats.length - 1) {
+                    seats += "; ";
+                }
+            }
+            document.getElementById("postiSelezionati").innerText = seats;
+           /*  const selectedSeatsElement = document.getElementById("postiSelezionati");
+            selectedSeatsElement.textContent = "Posti prenotati: " + bookingData.seats.join(", "); */ //
+            document.getElementById("titolo").innerText = "Titolo del film: " + bookingData.title;
+            document.getElementById("orario").innerText ="Orario: " + time;
+            document.getElementById("reservation-code").innerText = "Codice prenotazione: " + reservationCode;
+        }
+        // Avvia il recupero dei dati della prenotazione
+
+        window.onload = showDetails;
+
+
+        /* function getMovieTitle(movie) {
             switch (movie) {
                 case '0':
                 return 'Colpa delle stelle';
@@ -31,34 +69,8 @@
                 default:
                 return 'Titolo Film Sconosciuto';
             }
-            }
+        } */
         
-        const movieTitle = getMovieTitle(movie);
-        document.getElementById("filmTitolo").innerText = "Titolo del film: " + movieTitle;
-        document.getElementById("orario").innerText ="Orario: " + time;
-        document.getElementById("reservation-code").innerText = "Codice prenotazione: " + reservationCode;
-            
-        
-        // Recupera i dati della prenotazione
-        async function fetchBookingData() {
-        try {
-            // Effettua una richiesta al server per ottenere i dati della prenotazione
-            const response = await fetch("http://localhost:8080/movies/" + reservationCode);
-
-            if (!response.ok) {
-            throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
-            }
-
-            const bookingData = await response.json();
-            const selectedSeatsElement = document.getElementById("postiSelezionati");
-            selectedSeatsElement.textContent = "Posti prenotati: " + bookingData.seats.join(", "); //
-        } catch (error) {
-            console.error("Errore durante il recupero dei dati della prenotazione:", error);
-        }
-        }
-        // Avvia il recupero dei dati della prenotazione
-        fetchBookingData();
-
 
     </script>
 </body>

@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Prenotazione Posti Cinema</title>
   <style>
     body {
@@ -69,6 +72,7 @@
     <p id="filmDurata"></p>
     <p id="filmOraInizio"></p>
     <p id="filmRegista">Regista: Nome del Regista</p>
+    <p id="postiDisponibili"></p>
   </div>
   <div id="seats"></div>
   <button onclick="bookSeats()">Prenota</button>
@@ -81,7 +85,7 @@
     const movie = urlParams.get('movie');
     const time = urlParams.get('time');
     
-    function getMovieTitle(movie) {
+    /* function getMovieTitle(movie) {
       switch (movie) {
         case '0':
           return 'Colpa delle stelle';
@@ -94,7 +98,7 @@
       }
     }
     const movieTitle = getMovieTitle(movie);
-    document.getElementById("filmTitolo").innerText = movieTitle;
+    document.getElementById("filmTitolo").innerText = movieTitle; */
 
     async function fetchMovieDetails() {
       try {
@@ -103,8 +107,12 @@
           throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
           const data = await response.json();
           
+          document.getElementById("filmTitolo").innerText = data.title;
           document.getElementById("filmDurata").innerText = "Durata: " + data.length + " minuti";
           document.getElementById("filmOraInizio").innerText = "Ora di inizio: " + data.time;
+          document.getElementById("postiDisponibili").innerText = "Posti disponibili: " + data.available;
+
+          
           //document.getElementById("filmRegista").innerText = "Regista: " + data.regista;
           return data;
 
@@ -143,7 +151,7 @@
         for (let j = 0; j < seatData[i].length; j++) {
           const seat = document.createElement("div");
           seat.className = "seat";
-          if (seatData[i][j] === 0) {
+          if (seatData[j][i] === 1) {
             seat.classList.add("disabled");
           }
           seat.onclick = function() {
@@ -161,10 +169,10 @@
     function toggleSeatSelection(seat, row, col) {
       if (seat.classList.contains("selected")) {
         seat.classList.remove("selected");
-        seatData[row][col] = 1; // Imposta il posto come disponibile
+        seatData[row][col] = 0; // Imposta il posto come disponibile
       } else {
         seat.classList.add("selected");
-        seatData[row][col] = 0; // Imposta il posto come selezionato
+        seatData[row][col] = 2; // Imposta il posto come selezionato
       }
     }
 
@@ -173,8 +181,8 @@
       const selectedSeats = [];
       for (let i = 0; i < seatData.length; i++) {
         for (let j = 0; j < seatData[i].length; j++) {
-          if (seatData[i][j] === 0) {
-            selectedSeats.push({ row: i, col: j });
+          if (seatData[i][j] === 2) {
+            selectedSeats.push({ row: j, col: i });
           }
         }
       }

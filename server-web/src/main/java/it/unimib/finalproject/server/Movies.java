@@ -2,7 +2,6 @@ package it.unimib.finalproject.server;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -50,6 +49,7 @@ public class Movies {
 	}	 */
 	
 	private static List<List<Movie>> days = new ArrayList<List<Movie>>(7);
+	private static List<Reservation> reservations = new ArrayList<Reservation>();
 
 	static {
 		for(int i = 0; i < 7; i++) {
@@ -68,8 +68,6 @@ public class Movies {
 			rooms[0].setTime("18:00");
 			rooms[0].setRoom(5);
 			rooms[0].setLength(120);
-			rooms[0].setSeats(100);
-			rooms[0].setAvailable(100);
 			int[][] seatsGrid = new int[10][10];
 			for(int j = 0; j < 10; j++) {
 				for(int k = 0; k < 10; k++) {
@@ -81,8 +79,6 @@ public class Movies {
 			rooms[1].setTime("20:00");
 			rooms[1].setRoom(6);
 			rooms[1].setLength(90);
-			rooms[1].setSeats(100);
-			rooms[1].setAvailable(100);
 			seatsGrid = new int[10][10];
 			for(int j = 0; j < 10; j++) {
 				for(int k = 0; k < 10; k++) {
@@ -102,8 +98,6 @@ public class Movies {
 			rooms[0].setTime("18:00");
 			rooms[0].setRoom(5);
 			rooms[0].setLength(120);
-			rooms[0].setSeats(100);
-			rooms[0].setAvailable(100);
 			seatsGrid = new int[10][10];
 			for(int j = 0; j < 10; j++) {
 				for(int k = 0; k < 10; k++) {
@@ -114,8 +108,6 @@ public class Movies {
 			rooms[1].setTime("20:00");
 			rooms[1].setRoom(6);
 			rooms[1].setLength(90);
-			rooms[1].setSeats(100);
-			rooms[1].setAvailable(100);
 			seatsGrid = new int[10][10];
 			for(int j = 0; j < 10; j++) {
 				for(int k = 0; k < 10; k++) {
@@ -135,8 +127,6 @@ public class Movies {
 			rooms[0].setTime("18:00");
 			rooms[0].setRoom(5);
 			rooms[0].setLength(120);
-			rooms[0].setSeats(100);
-			rooms[0].setAvailable(100);
 			seatsGrid = new int[10][10];
 			for(int j = 0; j < 10; j++) {
 				for(int k = 0; k < 10; k++) {
@@ -147,8 +137,6 @@ public class Movies {
 			rooms[1].setTime("20:00");
 			rooms[1].setRoom(6);
 			rooms[1].setLength(90);
-			rooms[1].setSeats(100);
-			rooms[1].setAvailable(100);
 			seatsGrid = new int[10][10];
 			for(int j = 0; j < 10; j++) {
 				for(int k = 0; k < 10; k++) {
@@ -160,6 +148,7 @@ public class Movies {
 			days.get(i).add(mv);
 			day++;	
 		}
+		
 	}
 
 	@GET
@@ -187,8 +176,23 @@ public class Movies {
 	public Response postMovie(@PathParam ("dayIndex") int dayIndex, @PathParam ("movieIndex") int movieIndex, @PathParam ("time") String time, String body) {
 		try {
 			var mapper = new ObjectMapper();
-			var seats = mapper.readValue(body, Object[].class);
-			System.out.println(seats);
+			var reservation = mapper.readValue(body, Reservation.class);
+			//System.out.println(body);
+			//System.out.println(reservation.getSeats().get(0).getRow() + " " + reservation.getSeats().get(0).getColumn());
+			for(Room room : days.get(dayIndex).get(movieIndex).getRooms()) {
+				if(room.getTime().equals(time)) {
+					for(Seat seat : reservation.getSeats()) {
+						room.getSeatsGrid()[seat.getRow()][seat.getColumn()] = 1;					
+					}
+					reservation.setTitle(room.getTitle());
+					reservation.setDayIndex(dayIndex);
+					reservation.setMovieIndex(movieIndex);
+					reservation.setTime(time);
+					reservations.add(reservation);
+					room.updateAvailable();					
+					return Response.ok().build();
+				}
+			}
 		} catch (JsonMappingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -198,4 +202,17 @@ public class Movies {
 		}
 		return Response.ok().build();
 	}
+
+	@GET
+	@Path("/reservations/{code}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getReservation(@PathParam ("code") String code) {
+		for(Reservation reservation : reservations) {
+			if(reservation.getCode().equals(code)) {
+				return Response.ok(reservation).build();
+			}
+		}
+		return Response.status(Response.Status.NOT_FOUND).build();
+	}
+	
 }
