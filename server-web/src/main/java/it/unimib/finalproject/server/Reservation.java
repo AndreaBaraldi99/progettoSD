@@ -3,18 +3,17 @@ package it.unimib.finalproject.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Reservation {
     
-    @JsonProperty("seats")
     private List<Seat> seats = new ArrayList<Seat>();
-    @JsonProperty("code")
     private String code;
     private int dayIndex;
     private int movieIndex;
     private String time;
     private String title;
+    private String date;
+    private int room;
 
     public List<Seat> getSeats() {
         return seats;
@@ -51,5 +50,17 @@ public class Reservation {
     }
     public void setTitle(String title) {
         this.title = title;
+    }
+    public String getDate() {
+        return date;
+    }
+    public void setDate(String date) {
+        this.date = date;
+    }
+    public int getRoom() {
+        return room;
+    }
+    public void setRoom(int room) {
+        this.room = room;
     }
 }

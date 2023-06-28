@@ -68,11 +68,13 @@
 <body>
   <h1>Prenotazione Posti Cinema</h1>
   <div id="movie-info">
-    <h2 id="filmTitolo"> titolo</h2>
+    <h2 id="filmTitolo">titolo</h2>
+    <p id="data"></p>
     <p id="filmDurata"></p>
     <p id="filmOraInizio"></p>
     <p id="filmRegista">Regista: Nome del Regista</p>
     <p id="postiDisponibili"></p>
+    <p id="sala"></p>
   </div>
   <div id="seats"></div>
   <button onclick="bookSeats()">Prenota</button>
@@ -111,6 +113,8 @@
           document.getElementById("filmDurata").innerText = "Durata: " + data.length + " minuti";
           document.getElementById("filmOraInizio").innerText = "Ora di inizio: " + data.time;
           document.getElementById("postiDisponibili").innerText = "Posti disponibili: " + data.available;
+          document.getElementById("data").innerText = "Data: " + data.date;
+          document.getElementById("sala").innerText = "Sala: " + data.room;
 
           
           //document.getElementById("filmRegista").innerText = "Regista: " + data.regista;

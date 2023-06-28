@@ -1,9 +1,10 @@
 package it.unimib.finalproject.server;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -184,23 +185,23 @@ public class Movies {
 					for(Seat seat : reservation.getSeats()) {
 						room.getSeatsGrid()[seat.getRow()][seat.getColumn()] = 1;					
 					}
+					reservation.setDate(room.getDate());
 					reservation.setTitle(room.getTitle());
 					reservation.setDayIndex(dayIndex);
 					reservation.setMovieIndex(movieIndex);
 					reservation.setTime(time);
+					reservation.setRoom(room.getRoom());
 					reservations.add(reservation);
 					room.updateAvailable();					
 					return Response.ok().build();
 				}
 			}
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (JsonParseException | JsonMappingException e) {
+			Response.status(Response.Status.BAD_REQUEST).build();
+		} catch (IOException e) {
+			Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-		return Response.ok().build();
+		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 
 	@GET

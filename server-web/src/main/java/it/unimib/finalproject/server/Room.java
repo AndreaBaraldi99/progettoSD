@@ -3,6 +3,7 @@ package it.unimib.finalproject.server;
 public class Room {
 
     private String title;
+    private String date;
     private String time;
 	private int room;
 	private int length;
@@ -52,6 +53,12 @@ public class Room {
             for(int j = 0; j < seatsGrid[i].length; j++)
                 if(seatsGrid[i][j] == 0)
                     available++;
+    }
+    public String getDate() {
+        return date;
+    }
+    public void setDate(String date) {
+        this.date = date;
     }
     
 }

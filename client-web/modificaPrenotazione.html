@@ -10,7 +10,9 @@
     <div id="riepilogo">
         <p id="reservation-code"></p>
         <p id="titolo"></p>
+        <p id="data"></p>
         <p id="orario"></p>
+        <p id="sala"></p>
         <p>Posti Selezionati:</p>
         <p id="postiSelezionati"></p>
     </div>
@@ -50,8 +52,10 @@
            /*  const selectedSeatsElement = document.getElementById("postiSelezionati");
             selectedSeatsElement.textContent = "Posti prenotati: " + bookingData.seats.join(", "); */ //
             document.getElementById("titolo").innerText = "Titolo del film: " + bookingData.title;
+            document.getElementById("data").innerText = "Data: " + bookingData.date;
             document.getElementById("orario").innerText ="Orario: " + time;
             document.getElementById("reservation-code").innerText = "Codice prenotazione: " + reservationCode;
+            document.getElementById("sala").innerText = "Sala: " + bookingData.room;
         }
         // Avvia il recupero dei dati della prenotazione
 
