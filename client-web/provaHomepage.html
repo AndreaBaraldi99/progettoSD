@@ -20,7 +20,7 @@
         </script>
     </head>
     
-    <body>
+    <body style="overflow-y: scroll;">
         <div id="daysContainer">
             <button onclick="showTable(0)">Lunedì</button>
             <button onclick="showTable(1)">Martedì</button>
@@ -37,7 +37,14 @@
             <!-- Contenuto della tabella verrà generato dinamicamente -->
             </table>
         </div>
-    
+        <br><br>
+        <div id="formContainer" style="display: none;">
+            <h4>Inserisci il codice prenotazione:</h4>
+            <form onsubmit="submitForm(event)">
+                <input type="text" id="reservationCodeInput" required>
+                <input type="submit" value="Modifica Prenotazione">
+            </form>
+        </div>
         <script>
             async function fetchMovies() {
                 try {
@@ -97,10 +104,10 @@
                     tableHTML += "</tr>";
                 }
 
-
                 dayTable.innerHTML = tableHTML;
 
                 tableContainer.style.display = "block";
+                document.getElementById("formContainer").style.display = "block";
                 console.log(moviesData);
                 }
                 
@@ -108,6 +115,16 @@
                 sessionStorage.setItem("selectedMovieIndex", movieIndex);
                 window.location.href = "prenotazioni.html?index=" + movieIndex + "&movie=" + movie + "&time=" + time;
             }
+
+            function submitForm(event) {
+            event.preventDefault(); // Evita il comportamento predefinito di submit del form
+
+            const reservationCodeInput = document.getElementById("reservationCodeInput");
+            const reservationCode = reservationCodeInput.value;
+
+            // Effettua il reindirizzamento alla pagina di modifica prenotazione
+            window.location.href = "modificaPrenotazione.html?code=" + reservationCode;
+        }
           
         </script>
 

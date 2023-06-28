@@ -199,7 +199,7 @@
         if (!response.ok) {
             throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
         }
-        window.location.href = "modificaPrenotazione.html?code=" + reservationCode + "&movie=" + movie + "&time=" + time;
+        window.location.href = "modificaPrenotazione.html?code=" + reservationCode + "&movie=" + movie + "&time=" + time + "&index=" + movieIndex;
     } catch (error) {
         console.error("Errore durante la prenotazione dei posti:", error);
     }

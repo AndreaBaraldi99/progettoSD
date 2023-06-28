@@ -14,12 +14,18 @@
         <p>Posti Selezionati:</p>
         <p id="postiSelezionati"></p>
     </div>
+    <div id="modifica">
+        <p>Se desideri modificare i posti prenotati, clicca sul pulsante sottostante:</p>
+        <button onclick="modificaPrenotazione()">Modifica Posti</button>
+        <p>Se desideri cancellare la prenotazione, clicca sul pulsante sottostante:</p>
+        <button onclick="cancellaPrenotazione()">Cancella Prenotazione</button>
+    </div>
     <script>
-        //nota: le scritte del riepilogo non vengono mostrate, le sistemo poi
         const urlParams = new URLSearchParams(window.location.search);
         const reservationCode = urlParams.get('code');
         const movie = urlParams.get('movie');
         const time = urlParams.get('time');
+        const movieIndex = urlParams.get('index');
 
         async function fetchBookingData() {
             try {
@@ -50,26 +56,48 @@
            /*  const selectedSeatsElement = document.getElementById("postiSelezionati");
             selectedSeatsElement.textContent = "Posti prenotati: " + bookingData.seats.join(", "); */ //
             document.getElementById("titolo").innerText = "Titolo del film: " + bookingData.title;
-            document.getElementById("orario").innerText ="Orario: " + time;
+            document.getElementById("orario").innerText ="Orario: " + bookingData.time;
             document.getElementById("reservation-code").innerText = "Codice prenotazione: " + reservationCode;
         }
         // Avvia il recupero dei dati della prenotazione
 
         window.onload = showDetails;
 
+        async function modificaPrenotazione() {
+            const bookingData = await fetchBookingData();
+            const seats = bookingData.seats;
+            // Effettua una richiesta al server per rendere disponibili i posti occupati
+            try {
+                const response = await fetch("http://localhost:8080/movies/reservations/" + reservationCode + "/seats" + seats, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({seats: bookingData.seats})
+                })
+                if (!response.ok) {
+                    throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+                }
+                // Reindirizza l'utente alla pagina di selezione dei posti
+                window.location.href = "prenotazioni.html?index=" + movieIndex + "&movie=" + movie + "&time=" + time;
+            }catch(error) {
+                console.error("Errore durante la modifica della prenotazione:", error);
+            };
+        }
 
-        /* function getMovieTitle(movie) {
-            switch (movie) {
-                case '0':
-                return 'Colpa delle stelle';
-                case '1':
-                return 'Salvate il soldato Ryan';
-                case '2':
-                return 'Interstellar';
-                default:
-                return 'Titolo Film Sconosciuto';
-            }
-        } */
+        async function cancellaPrenotazione() {
+            // Effettua una richiesta al server per cancellare la prenotazione
+            modificaPrenotazione(); //rendo di nuovo disponibli i posti occupati
+            try{
+            const response = await fetch("http://localhost:8080/movies/reservations/" + reservationCode, {
+                method: "DELETE"
+            })
+            if (!response.ok) {
+                    throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+                }
+                window.location.href = "provaHomepage.html";
+            }catch(error) {
+                console.error("Errore durante la cancellazione della prenotazione:", error);
+            };
+        }
         
 
     </script>

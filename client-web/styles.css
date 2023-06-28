@@ -85,6 +85,21 @@ th, td {
   text-align: center;
   border: 1px solid #ddd;
 }
+#formContainer {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgb(101, 100, 100);
+}
+
+#formContainer {
+  text-align: center;
+}
+
+.center-input {
+  text-align: center;
+}
 
 /*Pagina di modificaPrenotazione*/
 #riepilogo{
@@ -92,3 +107,10 @@ th, td {
   font-family: 'Gill Sans', sans-serif;
   color:rgb(101, 100, 100);
 }
+
+#modifica{
+  text-align: center;
+  font-family: 'Gill Sans', sans-serif;
+  color:rgb(101, 100, 100);
+}
+
