@@ -1,0 +1,4 @@
+M0&{"dayIndex":0, "movieIndex":0, "roomIndex":0, "room":{"title":"Colpa delle stelle","date":"30/08/2023","time":"18:00","room":5,"length":120,"available":0,"seatsGrid":[[0,0,1,0,1],[1,0,0,1,0],[0,1,0,0,1],[0,0,0,1,0],[1,1,0,0,1]]}}
+M1&{"dayIndex":0, "movieIndex":0, "roomIndex":1, "room":{"title":"Colpa delle stelle","date":"30/08/2023","time":"20:00","room":5,"length":120,"available":0,"seatsGrid":[[0,0,1,0,1],[1,0,0,1,0],[0,1,0,0,1],[0,0,0,1,0],[1,1,0,0,1]]}}
+M2&{"dayIndex":0, "movieIndex":1, "roomIndex":0, "room":{"title":"Titanic","date":"30/08/2023","time":"18:00","room":6,"length":120,"available":0,"seatsGrid":[[0,0,1,0,1],[1,0,0,1,0],[0,1,0,0,1],[0,0,0,1,0],[1,1,0,0,1]]}}
+M3&{"dayIndex":0, "movieIndex":1, "roomIndex":1, "room":{"title":"Titanic","date":"30/08/2023","time":"20:00","room":6,"length":120,"available":0,"seatsGrid":[[0,0,1,0,1],[1,0,0,1,0],[0,1,0,0,1],[0,0,0,1,0],[1,1,0,0,1]]}}

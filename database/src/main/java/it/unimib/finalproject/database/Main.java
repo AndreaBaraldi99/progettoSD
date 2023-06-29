@@ -1,6 +1,7 @@
 package it.unimib.finalproject.database;
 
 import java.net.*;
+
 import java.io.*;
 
 /**
@@ -20,10 +21,11 @@ public class Main {
     public static void startServer() {
         try {
             var server = new ServerSocket(PORT);
-
+            Database database = new Database();
             System.out.println("Database listening at localhost:" + PORT);
+            //System.out.println(database.getData("M1"));
             while (true)
-                new Handler(server.accept()).start();
+                new Handler(server.accept(), database).start();
         } catch (IOException e) {
             System.err.println(e);
         }
@@ -34,24 +36,39 @@ public class Main {
      */
     private static class Handler extends Thread {
         private Socket client;
+        private Database database;
 
-        public Handler(Socket client) {
+        public Handler(Socket client, Database database) {
             this.client = client;
+            this.database = database;
         }
 
         public void run() {
             try {
+
                 var out = new PrintWriter(client.getOutputStream(), true);
                 var in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
                 String inputLine;
 
                 while ((inputLine = in.readLine()) != null) {
-                    if (".".equals(inputLine)) {
-                        out.println("bye");
-                        break;
+                    System.out.println("Received: " + inputLine);
+                    String[] keyValue = inputLine.split(" ");
+                    System.out.println("Input received");
+                    if (keyValue[0].equals("GET")) {
+                        out.println(database.getData(keyValue[1]));
+                    } else if (keyValue[0].equals("POST")) {
+                        database.setData(keyValue[1], keyValue[2]);
+                        out.println("OK");
+                    } else if (keyValue[0].equals("DELETE")) {
+                        database.deleteData(keyValue[1]);
+                        out.println("OK");
+                    } else if (keyValue[0].equals("UPDATE")) {
+                        database.updateData(keyValue[1], keyValue[2]);
+                        out.println("OK");
+                    } else {
+                        out.println("ERROR");
                     }
-                    out.println(inputLine);
                 }
 
                 in.close();

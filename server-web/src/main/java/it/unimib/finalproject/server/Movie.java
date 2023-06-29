@@ -1,10 +1,13 @@
 package it.unimib.finalproject.server;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Movie{
 	
 	private String title;
 	private String date;
-	private Room[] rooms;
+	private List<Room> rooms = new ArrayList<Room>();
 	
 	public String getTitle() {
 		return title;
@@ -18,10 +21,10 @@ public class Movie{
 	public void setDate(String date) {
 		this.date = date;
 	}
-	public Room[] getRooms() {
+	public List<Room> getRooms() {
 		return rooms;
 	}
-	public void setRooms(Room[] rooms) {
+	public void setRooms(List<Room> rooms) {
 		this.rooms = rooms;
 		for(Room r : rooms){
 			r.setTitle(title);
