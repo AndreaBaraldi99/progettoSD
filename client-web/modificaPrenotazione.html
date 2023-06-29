@@ -7,6 +7,9 @@
     <h3 style="text-align:center">Ecco un riepilogo dei dati relativi alla prenotazione:</h3>
 </head>
 <body>
+    <div>
+        <a href="provaHomepage.html"><button style="position: absolute; top: 10px; left: 10px;">Torna alla homepage</button></a>
+    </div>
     <div id="riepilogo">
         <p id="reservation-code"></p>
         <p id="titolo"></p>
@@ -49,7 +52,7 @@
             const bookingData = await fetchBookingData();
             let seats = "";
             for (let i = 0; i < bookingData.seats.length; i++) {
-                seats += "Posto: " + (bookingData.seats[i].column + 1) + ", Fila: " + (bookingData.seats[i].row + 1);
+                seats += "Posto: " + (bookingData.seats[i].row + 1) + ", Fila: " + (bookingData.seats[i].col + 1);
                 if (i !== bookingData.seats.length - 1) {
                     seats += "; ";
                 }
@@ -68,7 +71,8 @@
         window.onload = showDetails;
 
         async function modificaPrenotazione() {
-            const bookingData = await fetchBookingData();
+            window.location.href = "prenotazioni.html?index=" + movieIndex + "&movie=" + movie + "&time=" + time + "&code=" + reservationCode;
+            /* const bookingData = await fetchBookingData();
             const seats = bookingData.seats;
             // Effettua una richiesta al server per rendere disponibili i posti occupati
             try {
@@ -84,18 +88,16 @@
                 window.location.href = "prenotazioni.html?index=" + movieIndex + "&movie=" + movie + "&time=" + time;
             }catch(error) {
                 console.error("Errore durante la modifica della prenotazione:", error);
-            };
+            }; */
         }
 
         async function cancellaPrenotazione() {
-            // Effettua una richiesta al server per cancellare la prenotazione
-            modificaPrenotazione(); //rendo di nuovo disponibli i posti occupati
             try{
-            const response = await fetch("http://localhost:8080/movies/reservations/" + reservationCode, {
-                method: "DELETE"
-            })
-            if (!response.ok) {
-                    throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+                const response = await fetch("http://localhost:8080/movies/reservations/" + reservationCode, {
+                    method: "DELETE"
+                })
+                if (!response.ok) {
+                        throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
                 }
                 window.location.href = "provaHomepage.html";
             }catch(error) {

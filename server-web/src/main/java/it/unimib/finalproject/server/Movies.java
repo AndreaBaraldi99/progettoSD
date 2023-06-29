@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -198,8 +201,10 @@ public class Movies {
 			}
 		} catch (JsonParseException | JsonMappingException e) {
 			Response.status(Response.Status.BAD_REQUEST).build();
+			e.printStackTrace();
 		} catch (IOException e) {
 			Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			e.printStackTrace();
 		}
 		return Response.status(Response.Status.NOT_FOUND).build();
 	}
@@ -212,6 +217,61 @@ public class Movies {
 			if(reservation.getCode().equals(code)) {
 				return Response.ok(reservation).build();
 			}
+		}
+		return Response.status(Response.Status.NOT_FOUND).build();
+	}
+
+	@DELETE
+	@Path("/reservations/{code}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteReservation(@PathParam ("code") String code) {
+		for(Reservation reservation : reservations) {
+			if(reservation.getCode().equals(code)) {
+				Room[] toUpdate = days.get(reservation.getDayIndex()).get(reservation.getMovieIndex()).getRooms();
+				for(Room room : toUpdate) {
+					if(room.getTime().equals(reservation.getTime())) {
+						for(Seat seat : reservation.getSeats()) {
+							room.getSeatsGrid()[seat.getRow()][seat.getColumn()] = 0;					
+						}
+						room.updateAvailable();
+					}
+				}
+				reservations.remove(reservation);
+				return Response.ok().build();
+			}
+		}
+		return Response.status(Response.Status.NOT_FOUND).build();
+	}
+
+	@PUT
+	@Path("/reservations/{code}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateReservation(@PathParam ("code") String code, String body) {
+		var mapper = new ObjectMapper();
+		try {
+			var reservation = mapper.readValue(body, Reservation.class);
+			for(Reservation res : reservations){
+				if(res.getCode().equals(reservation.getCode())){
+					Room[] toUpdate = days.get(res.getDayIndex()).get(res.getMovieIndex()).getRooms();
+					for(Room room : toUpdate) {
+						if(room.getTime().equals(res.getTime())) {
+							for(Seat seat : res.getSeats()) {
+								room.getSeatsGrid()[seat.getRow()][seat.getColumn()] = 0;					
+							}
+							for(Seat seat : reservation.getSeats()) {
+								room.getSeatsGrid()[seat.getRow()][seat.getColumn()] = 1;					
+							}
+							room.updateAvailable();
+							res.setSeats(reservation.getSeats());
+							return Response.ok().build();
+						}
+					}
+				}
+			}
+		} catch (JsonProcessingException e) {
+			Response.status(Response.Status.BAD_REQUEST).build();
+			e.printStackTrace();
 		}
 		return Response.status(Response.Status.NOT_FOUND).build();
 	}

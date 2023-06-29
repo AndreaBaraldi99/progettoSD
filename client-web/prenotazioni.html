@@ -47,7 +47,7 @@
       background-color: #ff0000;
     }
 
-    button {
+    #prenota {
       display: block;
       margin: 20px auto;
       padding: 10px 20px;
@@ -60,13 +60,33 @@
       transition: background-color 0.3s ease;
     }
 
-    button:hover {
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 3px;
+      font-weight: bold;
+      color: rgb(101, 100, 100);
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      cursor: pointer;
+      border-color: #e7e7e7;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover{
+      background-color: #c8c4c4;
+    }
+
+    #prenota:hover {
       background-color: #45a049;
     }
   </style>
 </head>
 <body>
   <h1>Prenotazione Posti Cinema</h1>
+  <div>
+    <a href="provaHomepage.html"><button style="position: absolute; top: 10px; left: 10px;">Torna alla homepage</button></a>
+  </div> 
   <div id="movie-info">
     <h2 id="filmTitolo">titolo</h2>
     <p id="data"></p>
@@ -77,16 +97,18 @@
     <p id="sala"></p>
   </div>
   <div id="seats"></div>
-  <button onclick="bookSeats()">Prenota</button>
+  <button id = "prenota" onclick="bookSeats()">Prenota</button>
 
   <script>
     let seatData = [[]];
 
     const urlParams = new URLSearchParams(window.location.search);
-    const movieIndex = urlParams.get('index');
-    const movie = urlParams.get('movie');
-    const time = urlParams.get('time');
-    
+    var movieIndex = urlParams.get('index');
+    var movie = urlParams.get('movie');
+    var time = urlParams.get('time');
+    var code = urlParams.get('code');
+    var movieURL = "http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time;
+    var reservationURL = "http://localhost:8080/movies/reservations/" + code;
     /* function getMovieTitle(movie) {
       switch (movie) {
         case '0':
@@ -102,24 +124,12 @@
     const movieTitle = getMovieTitle(movie);
     document.getElementById("filmTitolo").innerText = movieTitle; */
 
-    async function fetchMovieDetails() {
+    async function fetchMovieDetails(url) {
       try {
-        const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time);
+        const response = await fetch(url);
         if (!response.ok)
           throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
-          const data = await response.json();
-          
-          document.getElementById("filmTitolo").innerText = data.title;
-          document.getElementById("filmDurata").innerText = "Durata: " + data.length + " minuti";
-          document.getElementById("filmOraInizio").innerText = "Ora di inizio: " + data.time;
-          document.getElementById("postiDisponibili").innerText = "Posti disponibili: " + data.available;
-          document.getElementById("data").innerText = "Data: " + data.date;
-          document.getElementById("sala").innerText = "Sala: " + data.room;
-
-          
-          //document.getElementById("filmRegista").innerText = "Regista: " + data.regista;
-          return data;
-
+          const data = await response.json();    
           return data;
         } catch (error) {
             console.error(error);
@@ -142,21 +152,48 @@
         });
         return uuid;
     }
-    const reservationCode = generateUniqueCode(); // Genera un codice univoco per la prenotazione
+    
+    var reservationCode = generateUniqueCode();// Genera un codice univoco per la prenotazione
+    if(code != null){
+      reservationCode = code;
+    }
     
     const seatsContainer = document.getElementById("seats");
-
+  
     // Funzione per creare la disposizione dei posti
     async function createSeats() {
-      const data = await fetchMovieDetails();
+      var data = {};
+      if(code != null){
+        const booked = await fetchMovieDetails(reservationURL);
+        movieIndex = booked.dayIndex;
+        movie = booked.movieIndex;
+        time = booked.time;
+        movieURL = "http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time;
+        data = await fetchMovieDetails(movieURL);
+        for(let i = 0; i < booked.seats.length; i++){
+          data.seatsGrid[booked.seats[i].row][booked.seats[i].col] = 2;
+        }
+      }else{
+        data = await fetchMovieDetails(movieURL);
+      }
+      document.getElementById("filmTitolo").innerText = data.title;
+      document.getElementById("filmDurata").innerText = "Durata: " + data.length + " minuti";
+      document.getElementById("filmOraInizio").innerText = "Ora di inizio: " + data.time;
+      document.getElementById("postiDisponibili").innerText = "Posti disponibili: " + data.available;
+      document.getElementById("data").innerText = "Data: " + data.date;
+      document.getElementById("sala").innerText = "Sala: " + data.room;
+      //document.getElementById("filmRegista").innerText = "Regista: " + data.regista;
       seatData = data.seatsGrid;
       for (let i = 0; i < seatData.length; i++) {
         const row = document.createElement("div");
         for (let j = 0; j < seatData[i].length; j++) {
           const seat = document.createElement("div");
           seat.className = "seat";
-          if (seatData[j][i] === 1) {
+          if (seatData[i][j] === 1) {
             seat.classList.add("disabled");
+          }
+          if(seatData[i][j] === 2){
+            seat.classList.add("selected");
           }
           seat.onclick = function() {
             if (!seat.classList.contains("disabled")) {
@@ -180,33 +217,50 @@
       }
     }
 
+    
+
     // Funzione per prenotare i posti selezionati
     async function bookSeats() {
       const selectedSeats = [];
       for (let i = 0; i < seatData.length; i++) {
         for (let j = 0; j < seatData[i].length; j++) {
           if (seatData[i][j] === 2) {
-            selectedSeats.push({ row: j, col: i });
+            selectedSeats.push({ row: i, col: j });
           }
         }
       }
-    
-    //richiesta POST 
-    const postData = {seats: selectedSeats,code: reservationCode};   
-    try {
-        const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time, {
-            method: "POST",
-            headers: { "Content-Type": "application/json"},
-            body: JSON.stringify(postData)
-        });
+      const postData = {seats: selectedSeats,code: reservationCode};
+      if(code != null){
+        try {
+            const response = await fetch("http://localhost:8080/movies/reservations/" + code, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json"},
+                body: JSON.stringify(postData)
+            });
 
-        if (!response.ok) {
-            throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+            if (!response.ok) {
+                throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+            }
+            window.location.href = "modificaPrenotazione.html?code=" + reservationCode + "&movie=" + movie + "&time=" + time + "&index=" + movieIndex;
+        } catch (error) {
+            console.error("Errore durante la prenotazione dei posti:", error);
         }
-        window.location.href = "modificaPrenotazione.html?code=" + reservationCode + "&movie=" + movie + "&time=" + time + "&index=" + movieIndex;
-    } catch (error) {
-        console.error("Errore durante la prenotazione dei posti:", error);
-    }
+      }else{
+        try {
+            const response = await fetch("http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time, {
+                method: "POST",
+                headers: { "Content-Type": "application/json"},
+                body: JSON.stringify(postData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
+            }
+            window.location.href = "modificaPrenotazione.html?code=" + reservationCode + "&movie=" + movie + "&time=" + time + "&index=" + movieIndex;
+        } catch (error) {
+            console.error("Errore durante la prenotazione dei posti:", error);
+        }
+      }
     }
 
     // Avvia la creazione dei posti
