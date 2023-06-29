@@ -109,22 +109,22 @@
                 tableContainer.style.display = "block";
                 document.getElementById("formContainer").style.display = "block";
                 console.log(moviesData);
-                }
+            }
                 
-                function changePage(movieIndex, movie, time) {
+            function changePage(movieIndex, movie, time) {
                 sessionStorage.setItem("selectedMovieIndex", movieIndex);
                 window.location.href = "prenotazioni.html?index=" + movieIndex + "&movie=" + movie + "&time=" + time;
             }
 
             function submitForm(event) {
-            event.preventDefault(); // Evita il comportamento predefinito di submit del form
+                event.preventDefault(); // Evita il comportamento predefinito di submit del form
 
-            const reservationCodeInput = document.getElementById("reservationCodeInput");
-            const reservationCode = reservationCodeInput.value;
+                const reservationCodeInput = document.getElementById("reservationCodeInput");
+                const reservationCode = reservationCodeInput.value;
 
-            // Effettua il reindirizzamento alla pagina di modifica prenotazione
-            window.location.href = "modificaPrenotazione.html?code=" + reservationCode;
-        }
+                // Effettua il reindirizzamento alla pagina di modifica prenotazione
+                window.location.href = "modificaPrenotazione.html?code=" + reservationCode;
+            }
           
         </script>
 

@@ -36,11 +36,13 @@
             try {
                 // Effettua una richiesta al server per ottenere i dati della prenotazione
                 const response = await fetch("http://localhost:8080/movies/reservations/" + reservationCode);
-
+                if(response.status == 404){
+                    alert("Prenotazione inesistente");
+                    window.location.href = "provaHomepage.html";
+                }
                 if (!response.ok) {
                     throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
                 }
-
                 const bookingData = await response.json();
                 return bookingData;
             } catch (error) {
@@ -68,7 +70,7 @@
         }
         // Avvia il recupero dei dati della prenotazione
 
-        window.onload = showDetails;
+        window.onload = showDetails();
 
         async function modificaPrenotazione() {
             window.location.href = "prenotazioni.html?index=" + movieIndex + "&movie=" + movie + "&time=" + time + "&code=" + reservationCode;

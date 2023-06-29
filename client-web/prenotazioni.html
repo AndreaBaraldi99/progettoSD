@@ -129,11 +129,11 @@
         const response = await fetch(url);
         if (!response.ok)
           throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
-          const data = await response.json();    
-          return data;
-        } catch (error) {
+        const data = await response.json();    
+        return data;
+      } catch (error) {
             console.error(error);
-        }
+      }
     }
      // Dati fittizi dei posti
     /* const seatData = [
@@ -229,6 +229,10 @@
           }
         }
       }
+      if (selectedSeats.length === 0) {
+        alert("Seleziona almeno un posto!");
+        return;
+      }
       const postData = {seats: selectedSeats,code: reservationCode};
       if(code != null){
         try {
@@ -264,7 +268,7 @@
     }
 
     // Avvia la creazione dei posti
-    createSeats();
+    window.onload = createSeats();
   </script>
 </body>
 </html>
