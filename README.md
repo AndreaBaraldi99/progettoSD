@@ -4,8 +4,8 @@ Lo scheletro propone degli esempi dei tre componenti da cui partire.
 
 ## Componenti del gruppo
 
-* Nome Cognome (Matricola) <email>
-* ...
+* Andrea Baraldi (839452) <a.baraldi3@campus.unimib.it>
+* Lucrezia Penati (886092) <l.penati9@campus.unimib.it>
 
 ## Compilazione ed esecuzione
 
@@ -21,3 +21,9 @@ Il client Web è invece un solo file HTML chiamato `index.html`, può essere ape
 ## Porte e indirizzi
 
 Il server Web si pone in ascolto all'indirizzo `localhost` alla porta `8080`. Il database si pone in ascolto allo stesso indirizzo del server Web ma alla porta `3030`.
+
+## Note del gruppo
+
+Abbiamo notato che, per il file che contiene gli esempi di partenza dei film, abbiamo un comportamento differente in base all'IDE che si utilizza: il progetto è settato per funzionare
+su eclipse e tramite riga di comando ma se il progetto viene aperto con Visual Studio Code, il file va spostato all'interno della cartella 'database' sotto 'finalproject'
+altrimenti il sistema non lo rileverà.
