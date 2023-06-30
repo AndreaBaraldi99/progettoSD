@@ -10,9 +10,8 @@ import java.util.Scanner;
 public class Database {
     
     private Map<String, String> database = new HashMap<String, String>();
-
     public Database(){
-        File myObj = new File("database/src/main/java/it/unimib/finalproject/database/startMovies.txt");
+        File myObj = new File("startMovies.txt");
         try {
             Scanner myReader = new Scanner(myObj);
             while (myReader.hasNextLine()) {

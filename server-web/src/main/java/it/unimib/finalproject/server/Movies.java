@@ -128,7 +128,7 @@ public class Movies {
 					out.println("POST_R" + reservation.getCode() + "&" + mapper.writeValueAsString(reservation));
 					if(in.readLine().equals("OK")) {
 						closeConnection(clientSocket, in, out);
-						return Response.ok().build();
+						return Response.created(null).build();
 					} else {
 						closeConnection(clientSocket, in, out);
 						return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
