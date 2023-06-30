@@ -307,9 +307,12 @@ public class Movies {
 	}
 
 	private void setMovie(DBResponse dbResponse, Movie movie) {
+		while(movie.getRooms().size() < dbResponse.getRoomIndex()+1) {
+			movie.getRooms().add(new Room());
+		}
 		movie.setTitle(dbResponse.getRoom().getTitle());
 		movie.setDate(dbResponse.getRoom().getDate());
-		movie.getRooms().add(dbResponse.getRoom());
+		movie.getRooms().set(dbResponse.getRoomIndex(), dbResponse.getRoom());
 	}
 	
 }
