@@ -8,8 +8,9 @@
 </head>
 <body>
     <div>
-        <a href="provaHomepage.html"><button style="position: absolute; top: 10px; left: 10px;">Torna alla homepage</button></a>
+        <a href="Homepage.html"><button style="position: absolute; top: 10px; left: 10px;">Torna alla homepage</button></a>
     </div>
+    <!--Visualizza un riepilogo con i dati della prenotazione-->
     <div id="riepilogo">
         <p id="reservation-code"></p>
         <p id="titolo"></p>
@@ -32,13 +33,14 @@
         const time = urlParams.get('time');
         const movieIndex = urlParams.get('index');
 
+        //Recupera i dati della prenotazione
         async function fetchBookingData() {
             try {
                 // Effettua una richiesta al server per ottenere i dati della prenotazione
                 const response = await fetch("http://localhost:8080/movies/reservations/" + reservationCode);
                 if(response.status == 404){
                     alert("Prenotazione inesistente");
-                    window.location.href = "provaHomepage.html";
+                    window.location.href = "Homepage.html";
                 }
                 if (!response.ok) {
                     throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
@@ -49,7 +51,7 @@
                 console.error("Errore durante il recupero dei dati della prenotazione:", error);
             }
         }
-
+        
         async function showDetails(){
             const bookingData = await fetchBookingData();
             let seats = "";
@@ -59,6 +61,7 @@
                     seats += "; ";
                 }
             }
+            
             document.getElementById("postiSelezionati").innerText = seats;
             document.getElementById("titolo").innerText = "Titolo del film: " + bookingData.title;
             document.getElementById("orario").innerText ="Orario: " + bookingData.time;
@@ -70,10 +73,12 @@
 
         window.onload = showDetails();
 
+        //Modifica i posti prenotati
         async function modificaPrenotazione() {
             window.location.href = "prenotazioni.html?index=" + movieIndex + "&movie=" + movie + "&time=" + time + "&code=" + reservationCode;
         }
 
+        //Cancella la prenotazione
         async function cancellaPrenotazione() {
             try{
                 const response = await fetch("http://localhost:8080/movies/reservations/" + reservationCode, {
@@ -82,7 +87,7 @@
                 if (!response.ok) {
                         throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
                 }
-                window.location.href = "provaHomepage.html";
+                window.location.href = "Homepage.html";
             }catch(error) {
                 console.error("Errore durante la cancellazione della prenotazione:", error);
             };

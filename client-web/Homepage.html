@@ -6,7 +6,7 @@
         <meta http-equiv="Expires" content="0" />
         <title>Homepage Cinema</title>
         <link rel="stylesheet" href="styles.css">
-        <h1 style="text-align:center">Cinema X</h1>
+        <h1 style="text-align:center">Cinema Bicocca</h1>
         <hr class="rounded">
         <h2 style="text-align:center">Programmazione</h2>
         <h3>Seleziona un giorno della settimana:</h3>
@@ -19,7 +19,7 @@
             });
         </script>
     </head>
-    
+    <!--Visualizza la tabella con film e orari-->
     <body style="overflow-y: scroll;">
         <div id="daysContainer">
             <button onclick="showTable(0)">Lunedì</button>
@@ -34,7 +34,7 @@
         <div id="tableContainer" style="display: none;">
             <h4 id="dayTitle"></h4>
             <table id="dayTable">
-            <!-- Contenuto della tabella verrà generato dinamicamente -->
+            <!-- Il contenuto della tabella verrà generato dinamicamente -->
             </table>
         </div>
         <br><br>
@@ -46,6 +46,7 @@
             </form>
         </div>
         <script>
+            //Funzione che permette di ottenere i dati delle proiezioni dalla chiamata API
             async function fetchMovies() {
                 try {
                     const response = await fetch("http://localhost:8080/movies");
@@ -57,7 +58,8 @@
                     console.error(error);
                 }
             }                
-           
+            
+            //Funzione che permette di visualizzare la tabella con il contenuto corrispondente al giorno
             async function showTable(dayIndex) {
                 const daysContainer = document.getElementById("daysContainer");
                 const tableContainer = document.getElementById("tableContainer");
@@ -100,14 +102,15 @@
 
                 tableContainer.style.display = "block";
                 document.getElementById("formContainer").style.display = "block";
-                console.log(moviesData);
             }
-                
+            
+            //Funzione che permette di passare alla pagina di prenotazione     
             function changePage(movieIndex, movie, time) {
                 sessionStorage.setItem("selectedMovieIndex", movieIndex);
                 window.location.href = "prenotazioni.html?index=" + movieIndex + "&movie=" + movie + "&time=" + time;
             }
 
+            //Funzione che permette di passare alla pagina di modifica prenotazione compilando la form con il codice prenotazione
             function submitForm(event) {
                 event.preventDefault(); // Evita il comportamento predefinito di submit del form
 
