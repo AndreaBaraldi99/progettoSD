@@ -36,10 +36,7 @@ public class Room {
     }
     public void setSeatsGrid(int[][] seatsGrid) {
         this.seatsGrid = seatsGrid;
-        for(int i = 0; i < seatsGrid.length; i++)
-            for(int j = 0; j < seatsGrid[i].length; j++)
-                if(seatsGrid[i][j] == 0)
-                    available++;
+        updateAvailable();
     }
     public String getTitle() {
         return title;

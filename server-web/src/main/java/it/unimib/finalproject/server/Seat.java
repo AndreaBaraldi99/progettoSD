@@ -1,12 +1,8 @@
 package it.unimib.finalproject.server;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class Seat {
 
-    @JsonProperty("row")
     private int row;
-    @JsonProperty("col")
     private int col;
     
     public int getRow() {
@@ -15,10 +11,10 @@ public class Seat {
     public void setRow(int row) {
         this.row = row;
     }
-    public int getColumn() {
+    public int getCol() {
         return col;
     }
-    public void setColumn(int col) {
+    public void setCol(int col) {
         this.col = col;
     }
 

@@ -23,7 +23,6 @@ public class Main {
             var server = new ServerSocket(PORT);
             Database database = new Database();
             System.out.println("Database listening at localhost:" + PORT);
-            //System.out.println(database.getData("M1"));
             while (true)
                 new Handler(server.accept(), database).start();
         } catch (IOException e) {
@@ -53,24 +52,29 @@ public class Main {
 
                 while ((inputLine = in.readLine()) != null) {
                     System.out.println("Received: " + inputLine);
-                    String[] keyValue = inputLine.split(" ");
+                    String[] keyValue = inputLine.split("_");
                     System.out.println("Input received");
                     if (keyValue[0].equals("GET")) {
                         out.println(database.getData(keyValue[1]));
+                        out.println("OK");
+                    } else if (keyValue[0].equals("GETBYTYPE")) {
+                        out.println(database.getDataByType(keyValue[1]));
+                        out.println("OK");
                     } else if (keyValue[0].equals("POST")) {
-                        database.setData(keyValue[1], keyValue[2]);
+                        String[] kv = keyValue[1].split("&");
+                        database.setData(kv[0], kv[1]);
                         out.println("OK");
                     } else if (keyValue[0].equals("DELETE")) {
                         database.deleteData(keyValue[1]);
                         out.println("OK");
                     } else if (keyValue[0].equals("UPDATE")) {
-                        database.updateData(keyValue[1], keyValue[2]);
+                        String[] kv = keyValue[1].split("&");
+                        database.updateData(kv[0], kv[1]);
                         out.println("OK");
                     } else {
                         out.println("ERROR");
                     }
                 }
-
                 in.close();
                 out.close();
                 client.close();

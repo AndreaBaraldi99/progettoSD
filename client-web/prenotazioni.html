@@ -109,20 +109,6 @@
     var code = urlParams.get('code');
     var movieURL = "http://localhost:8080/movies/" + movieIndex + "/" + movie + "/" + time;
     var reservationURL = "http://localhost:8080/movies/reservations/" + code;
-    /* function getMovieTitle(movie) {
-      switch (movie) {
-        case '0':
-          return 'Colpa delle stelle';
-        case '1':
-          return 'Salvate il soldato Ryan';
-        case '2':
-          return 'Interstellar';
-        default:
-          return 'Titolo Film Sconosciuto';
-      }
-    }
-    const movieTitle = getMovieTitle(movie);
-    document.getElementById("filmTitolo").innerText = movieTitle; */
 
     async function fetchMovieDetails(url) {
       try {
@@ -135,13 +121,6 @@
             console.error(error);
       }
     }
-     // Dati fittizi dei posti
-    /* const seatData = [
-      [1, 0, 1, 1, 0],
-      [0, 1, 0, 1, 1],
-      [1, 1, 0, 0, 1],
-      [0, 0, 1, 1, 0]
-    ]; */
     
     // Funzione per generare un codice univoco utilizzando una combinazione di caratteri esadecimali e caratteri specifici
     function generateUniqueCode() {

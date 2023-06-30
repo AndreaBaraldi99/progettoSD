@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,117 +25,6 @@ import jakarta.ws.rs.core.Response;
 
 @Path("/movies")
 public class Movies {
-		
-	private static List<List<Movie>> days = new ArrayList<List<Movie>>(7);
-	//private static List<List<Movie>> fromDB = new ArrayList<List<Movie>>(7);
-	private static List<Reservation> reservations = new ArrayList<Reservation>();
-
-	static {
-		/* for(int i = 0; i < 7; i++) {
-			fromDB.add(new ArrayList<Movie>(5));
-		} */
-		for(int i = 0; i < 7; i++) {
-			days.add(new ArrayList<Movie>());
-		}
-		int day = 30;
-		for(int i = 0; i < 7; i++) {
-			if(day > 31) {
-				day = 1;
-			}
-			Movie mv = new Movie();
-			mv.setTitle("Colpa delle stelle");
-			mv.setDate(day + "/08/2023");
-			List<Room> rooms = new ArrayList<Room>();
-			Room rooms1 = new Room();
-			rooms1.setTime("18:00");
-			rooms1.setRoom(5);
-			rooms1.setLength(120);
-			int[][] seatsGrid = new int[10][10];
-			for(int j = 0; j < 10; j++) {
-				for(int k = 0; k < 10; k++) {
-					seatsGrid[j][k] = (int)Math.round(Math.random());
-				}
-			}
-			rooms1.setSeatsGrid(seatsGrid);
-			rooms.add(rooms1);
-			rooms1 = new Room();
-			rooms1.setTime("20:00");
-			rooms1.setRoom(6);
-			rooms1.setLength(90);
-			seatsGrid = new int[10][10];
-			for(int j = 0; j < 10; j++) {
-				for(int k = 0; k < 10; k++) {
-					seatsGrid[j][k] = (int)Math.round(Math.random());
-				}
-			}
-			rooms1.setSeatsGrid(seatsGrid);
-			rooms.add(rooms1);
-			mv.setRooms(rooms);
-			days.get(i).add(mv);
-
-			mv = new Movie();
-			mv.setTitle("Salvate il soldato Ryan");
-			mv.setDate(day + "/08/2023");
-			rooms = new ArrayList<Room>();
-			rooms1 = new Room();
-			rooms1.setTime("18:00");
-			rooms1.setRoom(5);
-			rooms1.setLength(120);
-			seatsGrid = new int[10][10];
-			for(int j = 0; j < 10; j++) {
-				for(int k = 0; k < 10; k++) {
-					seatsGrid[j][k] = (int)Math.round(Math.random());
-				}
-			}
-			rooms1.setSeatsGrid(seatsGrid);
-			rooms.add(rooms1);
-			rooms1 = new Room();
-			rooms1.setTime("20:00");
-			rooms1.setRoom(6);
-			rooms1.setLength(90);
-			seatsGrid = new int[10][10];
-			for(int j = 0; j < 10; j++) {
-				for(int k = 0; k < 10; k++) {
-					seatsGrid[j][k] = (int)Math.round(Math.random());
-				}
-			}
-			rooms1.setSeatsGrid(seatsGrid);
-			rooms.add(rooms1);
-			mv.setRooms(rooms);
-			days.get(i).add(mv);
-
-			mv = new Movie();
-			mv.setTitle("Interstellar");
-			mv.setDate(day + "/08/2023");
-			rooms = new ArrayList<Room>();
-			rooms1 = new Room();
-			rooms1.setTime("18:00");
-			rooms1.setRoom(5);
-			rooms1.setLength(120);
-			seatsGrid = new int[10][10];
-			for(int j = 0; j < 10; j++) {
-				for(int k = 0; k < 10; k++) {
-					seatsGrid[j][k] = (int)Math.round(Math.random());
-				}
-			}
-			rooms1.setSeatsGrid(seatsGrid);
-			rooms1 = new Room();
-			rooms1.setTime("20:00");
-			rooms1.setRoom(6);
-			rooms1.setLength(90);
-			seatsGrid = new int[10][10];
-			for(int j = 0; j < 10; j++) {
-				for(int k = 0; k < 10; k++) {
-					seatsGrid[j][k] = (int)Math.round(Math.random());
-				}
-			}
-			rooms1.setSeatsGrid(seatsGrid);
-			mv.setRooms(rooms);
-			days.get(i).add(mv);
-			day++;	
-		}
-		
-	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -149,43 +37,34 @@ public class Movies {
 			Socket clientSocket = new Socket("localhost", 3030);
 			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			PrintStream out = new PrintStream(clientSocket.getOutputStream());
-			String request = "GET M";
-			int movieIndex = 0;
+			String request = "GETBYTYPE_M";
+			out.println(request);
 			while(true){
-				request += movieIndex;
-				out.println(request);
 				String response = in.readLine();
-				if(response == null || response.equals("") || response.equals("null")){
+				if(response == null || response.equals("") || response.equals("null") || response.equals("OK")){
 					break;
 				}
 				var mapper = new ObjectMapper();
 				DBResponse dbResponse = mapper.readValue(response, DBResponse.class);
 				List<Movie> dayMovies = fromDB.get(dbResponse.getDayIndex());
 				if (dayMovies.size() <= dbResponse.getMovieIndex()) {
+					while(dayMovies.size() < dbResponse.getMovieIndex()) {
+						dayMovies.add(new Movie());
+					}
 					Movie movie = new Movie();
-					movie.setTitle(dbResponse.getRoom().getTitle());
-					movie.setDate(dbResponse.getRoom().getDate());
-					movie.getRooms().add(dbResponse.getRoom());
+					setMovie(dbResponse, movie);
 					dayMovies.add(dbResponse.getMovieIndex(), movie);
 				} else {
 					Movie movie = dayMovies.get(dbResponse.getMovieIndex());
-					movie.getRooms().add(dbResponse.getRoom());
+					setMovie(dbResponse, movie);
 				}
-				/* if(fromDB.get(dbResponse.getDayIndex()).get(dbResponse.getMovieIndex()) == null){
-					Movie movie = new Movie();
-					movie.setTitle(dbResponse.getRoom().getTitle());
-					movie.setDate(dbResponse.getRoom().getDate());
-					fromDB.get(dbResponse.getDayIndex()).add(dbResponse.getMovieIndex(), movie);
-				}					
-				fromDB.get(dbResponse.getDayIndex()).get(dbResponse.getMovieIndex()).getRooms().add(dbResponse.getRoom()); */
-				movieIndex++;
-				request = "GET M";
 			}
-
+			closeConnection(clientSocket, in, out);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
+
 		return Response.ok(fromDB).build();
 	}
 	
@@ -193,12 +72,26 @@ public class Movies {
 	@Path("/{dayIndex}/{movieIndex}/{time}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMovie(@PathParam ("dayIndex") int dayIndex, @PathParam ("movieIndex") int movieIndex, @PathParam ("time") String time) {
-		for(Room room : days.get(dayIndex).get(movieIndex).getRooms()) {
-			if(room.getTime().equals(time)) {
-				return Response.ok(room).build();
+		try {
+			Socket clientSocket = new Socket("localhost", 3030);
+			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			PrintStream out = new PrintStream(clientSocket.getOutputStream());
+			String request = "GET_M" + dayIndex + movieIndex + time;
+			out.println(request);
+			String response = in.readLine();
+			if(response == null || response.equals("") || response.equals("null")){
+				closeConnection(clientSocket, in, out);
+				return Response.status(Response.Status.NOT_FOUND).build();
 			}
+			var mapper = new ObjectMapper();
+			DBResponse dbResponse = mapper.readValue(response, DBResponse.class);
+			closeConnection(clientSocket, in, out);
+			return Response.ok(dbResponse.getRoom()).build();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 
 	@POST
@@ -209,66 +102,139 @@ public class Movies {
 		try {
 			var mapper = new ObjectMapper();
 			var reservation = mapper.readValue(body, Reservation.class);
-			//System.out.println(body);
-			//System.out.println(reservation.getSeats().get(0).getRow() + " " + reservation.getSeats().get(0).getColumn());
-			for(Room room : days.get(dayIndex).get(movieIndex).getRooms()) {
-				if(room.getTime().equals(time)) {
-					for(Seat seat : reservation.getSeats()) {
-						room.getSeatsGrid()[seat.getRow()][seat.getColumn()] = 1;					
-					}
-					reservation.setDate(room.getDate());
-					reservation.setTitle(room.getTitle());
+			Socket clientSocket = new Socket("localhost", 3030);
+			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			PrintStream out = new PrintStream(clientSocket.getOutputStream());
+			String request = "GET_M" + dayIndex + movieIndex + time;
+			out.println(request);
+			String response = in.readLine();
+			if(response == null || response.equals("") || response.equals("null")){
+				closeConnection(clientSocket, in, out);
+				return Response.status(Response.Status.NOT_FOUND).build();
+			} else if(in.readLine().equals("OK")){
+				DBResponse dbResponse = mapper.readValue(response, DBResponse.class);
+				for(Seat seat : reservation.getSeats()) {
+						dbResponse.getRoom().getSeatsGrid()[seat.getRow()][seat.getCol()] = 1;					
+				}
+				dbResponse.getRoom().updateAvailable();
+				out.println("UPDATE_M" + dayIndex + movieIndex + time + "&" + mapper.writeValueAsString(dbResponse));
+				if(in.readLine().equals("OK")) {
+					reservation.setDate(dbResponse.getRoom().getDate());
+					reservation.setTitle(dbResponse.getRoom().getTitle());
 					reservation.setDayIndex(dayIndex);
 					reservation.setMovieIndex(movieIndex);
 					reservation.setTime(time);
-					reservation.setRoom(room.getRoom());
-					reservations.add(reservation);
-					room.updateAvailable();					
-					return Response.ok().build();
+					reservation.setRoom(dbResponse.getRoom().getRoom());
+					out.println("POST_R" + reservation.getCode() + "&" + mapper.writeValueAsString(reservation));
+					if(in.readLine().equals("OK")) {
+						closeConnection(clientSocket, in, out);
+						return Response.ok().build();
+					} else {
+						closeConnection(clientSocket, in, out);
+						return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+					}
+				} else {
+					closeConnection(clientSocket, in, out);
+					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 				}
-			}
+			}else {
+				closeConnection(clientSocket, in, out);
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			} 
 		} catch (JsonParseException | JsonMappingException e) {
-			Response.status(Response.Status.BAD_REQUEST).build();
 			e.printStackTrace();
+			return Response.status(Response.Status.BAD_REQUEST).build();
 		} catch (IOException e) {
-			Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 
 	@GET
 	@Path("/reservations/{code}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getReservation(@PathParam ("code") String code) {
-		for(Reservation reservation : reservations) {
-			if(reservation.getCode().equals(code)) {
+		try {
+			Socket clientSocket = new Socket("localhost", 3030);
+			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			PrintStream out = new PrintStream(clientSocket.getOutputStream());
+			String request = "GET_R" + code;
+			out.println(request);
+			String response = in.readLine();
+			if(response == null || response.equals("") || response.equals("null")){
+				closeConnection(clientSocket, in, out);
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}else if(in.readLine().equals("OK")){
+				var mapper = new ObjectMapper();
+				Reservation reservation = mapper.readValue(response, Reservation.class);
+				closeConnection(clientSocket, in, out);
 				return Response.ok(reservation).build();
+			}else{
+				closeConnection(clientSocket, in, out);
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 
 	@DELETE
 	@Path("/reservations/{code}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteReservation(@PathParam ("code") String code) {
-		for(Reservation reservation : reservations) {
-			if(reservation.getCode().equals(code)) {
-				List<Room> toUpdate = days.get(reservation.getDayIndex()).get(reservation.getMovieIndex()).getRooms();
-				for(Room room : toUpdate) {
-					if(room.getTime().equals(reservation.getTime())) {
-						for(Seat seat : reservation.getSeats()) {
-							room.getSeatsGrid()[seat.getRow()][seat.getColumn()] = 0;					
-						}
-						room.updateAvailable();
+
+		try {
+			Socket clientSocket = new Socket("localhost", 3030);
+			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			PrintStream out = new PrintStream(clientSocket.getOutputStream());
+			String request = "GET_R" + code;
+			out.println(request);
+			String response = in.readLine();
+			if(response == null || response.equals("") || response.equals("null")){
+				closeConnection(clientSocket, in, out);
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}else if(in.readLine().equals("OK")){
+				var mapper = new ObjectMapper();
+				Reservation reservation = mapper.readValue(response, Reservation.class);
+				out.println("GET_M" + reservation.getDayIndex() + reservation.getMovieIndex() + reservation.getTime());
+				response = in.readLine();
+				if(response == null || response.equals("") || response.equals("null")){
+					closeConnection(clientSocket, in, out);
+					return Response.status(Response.Status.NOT_FOUND).build();
+				}else if(in.readLine().equals("OK")){
+					DBResponse dbResponse = mapper.readValue(response, DBResponse.class);
+					for(Seat seat : reservation.getSeats()) {
+						dbResponse.getRoom().getSeatsGrid()[seat.getRow()][seat.getCol()] = 0;					
 					}
-				}
-				reservations.remove(reservation);
-				return Response.ok().build();
+					dbResponse.getRoom().updateAvailable();
+					out.println("UPDATE_M" + reservation.getDayIndex() + reservation.getMovieIndex() + reservation.getTime() + "&" + mapper.writeValueAsString(dbResponse));
+					if(in.readLine().equals("OK")) {
+						out.println("DELETE_R" + code);
+						if(in.readLine().equals("OK")) {
+							closeConnection(clientSocket, in, out);
+							return Response.ok().build();
+						} else {
+							closeConnection(clientSocket, in, out);
+							return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+						}
+					} else {
+						closeConnection(clientSocket, in, out);
+						return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+					}
+				}else{
+					closeConnection(clientSocket, in, out);
+					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+				}				
+			}else{
+				closeConnection(clientSocket, in, out);
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 
 	@PUT
@@ -276,32 +242,74 @@ public class Movies {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateReservation(@PathParam ("code") String code, String body) {
-		var mapper = new ObjectMapper();
+
 		try {
-			var reservation = mapper.readValue(body, Reservation.class);
-			for(Reservation res : reservations){
-				if(res.getCode().equals(reservation.getCode())){
-					List<Room> toUpdate = days.get(res.getDayIndex()).get(res.getMovieIndex()).getRooms();
-					for(Room room : toUpdate) {
-						if(room.getTime().equals(res.getTime())) {
-							for(Seat seat : res.getSeats()) {
-								room.getSeatsGrid()[seat.getRow()][seat.getColumn()] = 0;					
-							}
-							for(Seat seat : reservation.getSeats()) {
-								room.getSeatsGrid()[seat.getRow()][seat.getColumn()] = 1;					
-							}
-							room.updateAvailable();
-							res.setSeats(reservation.getSeats());
-							return Response.ok().build();
-						}
+			Socket clientSocket = new Socket("localhost", 3030);
+			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			PrintStream out = new PrintStream(clientSocket.getOutputStream());
+			String request = "GET_R" + code;
+			out.println(request);
+			String response = in.readLine();
+			if(response == null || response.equals("") || response.equals("null")){
+				closeConnection(clientSocket, in, out);
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}else if(in.readLine().equals("OK")){
+				var mapper = new ObjectMapper();
+				Reservation reservation = mapper.readValue(response, Reservation.class);
+				Reservation newReservation = mapper.readValue(body, Reservation.class);
+				out.println("GET_M" + reservation.getDayIndex() + reservation.getMovieIndex() + reservation.getTime());
+				response = in.readLine();
+				if(response == null || response.equals("") || response.equals("null")){
+					closeConnection(clientSocket, in, out);
+					return Response.status(Response.Status.NOT_FOUND).build();
+				}else if(in.readLine().equals("OK")){
+					DBResponse dbResponse = mapper.readValue(response, DBResponse.class);
+					for(Seat seat : reservation.getSeats()) {
+						dbResponse.getRoom().getSeatsGrid()[seat.getRow()][seat.getCol()] = 0;					
 					}
+					for(Seat seat : newReservation.getSeats()) {
+						dbResponse.getRoom().getSeatsGrid()[seat.getRow()][seat.getCol()] = 1;					
+					}
+					dbResponse.getRoom().updateAvailable();
+					out.println("UPDATE_M" + reservation.getDayIndex() + reservation.getMovieIndex() + reservation.getTime() + "&" + mapper.writeValueAsString(dbResponse));
+					if(in.readLine().equals("OK")){
+						reservation.setSeats(newReservation.getSeats());
+						out.println("UPDATE_R" + code + "&" + mapper.writeValueAsString(reservation));
+						if(in.readLine().equals("OK")) {
+							closeConnection(clientSocket, in, out);
+							return Response.ok().build();
+						} else {
+							closeConnection(clientSocket, in, out);
+							return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+						}
+					} else {
+						closeConnection(clientSocket, in, out);
+						return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+					}
+				} else {
+					closeConnection(clientSocket, in, out);
+					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 				}
-			}
-		} catch (JsonProcessingException e) {
-			Response.status(Response.Status.BAD_REQUEST).build();
+			} else {
+				closeConnection(clientSocket, in, out);
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}			
+		} catch (IOException e) {
 			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-		return Response.status(Response.Status.NOT_FOUND).build();
+	}
+	
+	private void closeConnection(Socket clientSocket, BufferedReader in, PrintStream out) throws IOException {
+		in.close();
+		out.close();
+		clientSocket.close();
+	}
+
+	private void setMovie(DBResponse dbResponse, Movie movie) {
+		movie.setTitle(dbResponse.getRoom().getTitle());
+		movie.setDate(dbResponse.getRoom().getDate());
+		movie.getRooms().add(dbResponse.getRoom());
 	}
 	
 }

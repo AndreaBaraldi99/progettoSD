@@ -60,8 +60,6 @@
                 }
             }
             document.getElementById("postiSelezionati").innerText = seats;
-           /*  const selectedSeatsElement = document.getElementById("postiSelezionati");
-            selectedSeatsElement.textContent = "Posti prenotati: " + bookingData.seats.join(", "); */ //
             document.getElementById("titolo").innerText = "Titolo del film: " + bookingData.title;
             document.getElementById("orario").innerText ="Orario: " + bookingData.time;
             document.getElementById("data").innerText = "Data: " + bookingData.date;
@@ -74,23 +72,6 @@
 
         async function modificaPrenotazione() {
             window.location.href = "prenotazioni.html?index=" + movieIndex + "&movie=" + movie + "&time=" + time + "&code=" + reservationCode;
-            /* const bookingData = await fetchBookingData();
-            const seats = bookingData.seats;
-            // Effettua una richiesta al server per rendere disponibili i posti occupati
-            try {
-                const response = await fetch("http://localhost:8080/movies/reservations/" + reservationCode + "/seats" + seats, {
-                method: "PUT",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({seats: bookingData.seats})
-                })
-                if (!response.ok) {
-                    throw new Error(`Response was not successful: ${response.status} ${response.statusText}`);
-                }
-                // Reindirizza l'utente alla pagina di selezione dei posti
-                window.location.href = "prenotazioni.html?index=" + movieIndex + "&movie=" + movie + "&time=" + time;
-            }catch(error) {
-                console.error("Errore durante la modifica della prenotazione:", error);
-            }; */
         }
 
         async function cancellaPrenotazione() {

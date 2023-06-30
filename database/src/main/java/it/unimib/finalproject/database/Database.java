@@ -22,14 +22,23 @@ public class Database {
             }
             myReader.close();
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     public String getData(String key) {
         return database.get(key);
-    } 
+    }
+
+    public String getDataByType(String type){
+        String result = "";
+        for (Map.Entry<String, String> entry : database.entrySet()) {
+            if(entry.getKey().startsWith(type)){
+                result += entry.getValue() + "\n";
+            }
+        }
+        return result;
+    }
 
     public synchronized void setData(String key, String value) {
         database.put(key, value);

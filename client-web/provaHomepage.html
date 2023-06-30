@@ -86,14 +86,6 @@
                 tableHTML += "<th>Title</th>";
                 tableHTML += "<th>Time</th>";
                 tableHTML += "</tr>";
-/* 
-                for (const [index, movie] of movies.entries()) {
-                    tableHTML += "<tr>";
-                    tableHTML += "<td>" + movie.title + "</td>";
-                    for(let x in moviesData[dayIndex][index].rooms)
-                        tableHTML += "<td onclick='changePage(" + index + ")'>" + movie.time + "</td>";
-                    tableHTML += "</tr>";
-                } */
 
                 for(let i = 0; i < moviesData[dayIndex].length; i++){
                     tableHTML += "<tr>";
