@@ -27,3 +27,5 @@ Il server Web si pone in ascolto all'indirizzo `localhost` alla porta `8080`. Il
 Abbiamo notato che, per il file che contiene gli esempi di partenza dei film, abbiamo un comportamento differente in base all'IDE che si utilizza: il progetto è settato per funzionare
 su eclipse e tramite riga di comando ma se il progetto viene aperto con Visual Studio Code, il file va spostato all'interno della cartella 'database' sotto 'finalproject'
 altrimenti il sistema non lo rileverà.
+
+Sul progetto: come da screenshot, alcuni dati dei film richiesti sono all'interno della pagina di prenotazione che si raggiunge cliccando l'orario del film che si desidera prenotare
