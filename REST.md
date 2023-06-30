@@ -15,7 +15,7 @@ Documentazione delle API REST di esempio. Si assume che i dati vengano scambiati
 **Body richiesta**: Non è previsto un body.
 
 **Risposta**: In caso di successo della chiamata, viene restituita la rappresentazione in JSON della programmazione settimanale, cioè un array JSON che comprende 7 array JSON, ognuno dei quali
-ha all'interno un oggetto JSON per ogni film con i campi `title`, `date` (due stringhe) e `rooms` (un array di oggetti JSON). All`interno di rooms sono compresi tutte le
+ha all'interno un oggetto JSON per ogni film con i campi `title`, `date` (due stringhe) e `rooms` (un array di oggetti JSON). All'interno di rooms sono compresi tutte le
 visioni dello stesso film in base all'orario. In particolare, esso è un oggetto JSON con i campi `title`, `date`, `time` (tre stringhe), `room`, `length`, `available` (tre interi)
 e seatsGrid (una matrice di interi) che rappresenta la disposizione dei posti della sala (con il valore 0 se il posto è libero e il valore 1 se il posto è occupato).
 
